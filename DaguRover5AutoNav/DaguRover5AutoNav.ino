@@ -213,7 +213,7 @@ void loop(){
     turn_time_mult = telem.parseInt();
     if(turn_time_mult == 0)
                 turn_time_mult = 4;          
-    
+
     switch(val)
     {
       case 'f' : 

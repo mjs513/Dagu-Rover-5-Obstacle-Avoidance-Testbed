@@ -35,20 +35,23 @@ const boolean fastmode = true;
 //
 //const int obsDist = 27;
 const int obsDist = 27; //was 47
-const int sidedistancelimit = 25;  //
-const int fowardheadThreshold = 29; //was 49, 39
-const int lcThreshold = 27;         // was 47
-const int lcIRthreshold = 27;  //was 45, last 47
-const int sideSensorThreshold = 22; //was 42
+const int sidedistancelimit = 27;  //
+const int fowardheadThreshold = 27; //was 49, 39, 29
+const int lcThreshold = 26;         // was 47,27
+const int lcIRthreshold = 25;  //was 45, last 47
+const int sideSensorThreshold = 27; //was 42
+const max_IR_distance 80
 
 const int backupSensorThreshold = 17;		//17.78 - not implemented yet
 
 
 //Set Motor Speed
-const int speed = 40;
+const int speed = 50;
 const int turnSpeed = 150; 
 int turn_time_mult = 2;
 int turn_time;
+
+#define v2Amps (5/1023)
 
 const int left_37 = 250;	//was 387 for 37 deg, 250 for 22deg
 const int right_37 = 295;	//was 440 for 37, 295 for 22 deg

@@ -161,7 +161,7 @@ void Select_Direction() {
       Delta_Angle = border[i].second - border[i].first + angle;
       //telem << "DELTA ANGLE: " << Delta_Angle << endl << endl;
     
-      if (fabs(Delta_Angle) < 22.5)   // was 60
+      if (fabs(Delta_Angle) < 22.5)   // was 60, 30
       {
         ////////////////////////////////////////////////////
         //

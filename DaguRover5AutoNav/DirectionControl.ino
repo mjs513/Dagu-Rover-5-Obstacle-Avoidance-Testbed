@@ -41,12 +41,11 @@ void decide_direction() {
 		//rebound algorithm
 		if(rearIRdistance > backupSensorThreshold) {
 			mBackward();
-			delay(250);
+			delay(500);
 			mStop();
-			//delay(250);	//delay half a second
 		} else {
 			mBackward();
-			delay(12);
+			delay(100);
 			mStop();
 		}    
 		nextMove = "RunBubble";
@@ -63,18 +62,17 @@ void decide_direction() {
 		//rebound algorithm
 		if(rearIRdistance > backupSensorThreshold) {
 			mBackward();
-			delay(250);
+			delay(500);
 			mStop();
-			//delay(250);	//delay half a second
 		} else {
 			mBackward();
-			delay(12);
+			delay(100);		//was 250
 			mStop();
 		}   
 		//nextMove = "RunBubble";
 		if(cm[0] > cm[2]) {
 				//nextMove = "Left";
-				turn_time = left_37;
+				turn_time = left_57;  //was 37
 				telem << "(DC) Next Move is left (Center Blocked)" << endl;
 				mLeft();
 				delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
@@ -82,7 +80,7 @@ void decide_direction() {
 				nextMove = "Straight";
 		} else if(cm[2] < cm[0]){
 				//nextMove = "Right";
-				turn_time = right_37;
+				turn_time = right_57; //was 37
 				telem << "(DC) Next Move is right (Center Blocked)" << endl;
 				mRight();
 				delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
@@ -92,8 +90,6 @@ void decide_direction() {
 			nextMove = "RunBubble";
 		}
 		//telem << "(DC) Next Move Determined by bubble [fwd sensors blocked - backup first]" << endl;
-		
-		
 	}
 
 	// What about the angled looking  detectors?

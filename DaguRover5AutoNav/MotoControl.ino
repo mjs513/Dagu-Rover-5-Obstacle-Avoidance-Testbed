@@ -32,6 +32,7 @@ void mBackward()
   analogWrite (pwm_rr, speed);
   analogWrite (pwm_lr, speed);
   analogWrite (pwm_rf, speed);
+  
 }
 
 void mForward() {  
@@ -44,6 +45,7 @@ void mForward() {
   analogWrite (pwm_rr, speed);
   analogWrite (pwm_lr, speed);
   analogWrite (pwm_rf, speed);  
+  
 }
 
 void mLeft() {
@@ -56,7 +58,7 @@ void mLeft() {
   analogWrite (pwm_rr, turnSpeed);
   analogWrite (pwm_lr, turnSpeed);
   analogWrite (pwm_rf, turnSpeed);
-
+  
 }
 
 void mRight()
@@ -70,7 +72,7 @@ void mRight()
   analogWrite (pwm_rr, turnSpeed);
   analogWrite (pwm_lr, turnSpeed);
   analogWrite (pwm_rf, turnSpeed);
-
+  
 }
 
 void mStop() {
@@ -78,18 +80,43 @@ void mStop() {
   analogWrite(pwm_lf, 0);
   analogWrite(pwm_rr, 0);
   analogWrite(pwm_lr, 0);
-  analogWrite(pwm_rf, 0);  
+  analogWrite(pwm_rf, 0);
 
-/*
-  int ticksA = encA.read();
-  int ticksB = encB.read();
-  int ticksC = encC.read();
-  int ticksD = encD.read();
-  
-  telem.println(ticksA);  telem.println(ticksB);
-  telem.println(ticksC);  telem.println(ticksD);
-  encA.write(0); encB.write(0); encC.write(0); encD.write(0);
-*/  
 }
 
+void getTicks_reset(){
+  int ticksLF = encA.read();
+  int ticksRF = encB.read();
+  int ticksRR = encC.read();
+  int ticksLR = encD.read();
+  
+  telem.println(ticksLF);  telem.println(ticksRF);
+  telem.println(ticksLR);  telem.println(ticksRR);
+  encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+}
 
+void getTicks_noreset(){
+  int ticksLF = encA.read();
+  int ticksRF = encB.read();
+  int ticksRR = encC.read();
+  int ticksLR = encD.read();
+  
+  telem.println(ticksLF);  telem.println(ticksRF);
+  telem.println(ticksLR);  telem.println(ticksRR);
+
+}
+
+void getCurrent() {
+      telem.print("LF-Current: ");
+      telem.println(analogRead(CURRENTLF)*v2Amps);
+      
+      telem.print("RR-Current: ");
+      telem.println(analogRead(CURRENTRR)*v2Amps);
+      
+      telem.print("LR-Current: ");
+      telem.println(analogRead(CURRENTLR)*v2Amps);
+      
+      telem.print("RF-Current: ");
+      telem.println(analogRead(CURRENTRR)*v2Amps);
+
+}

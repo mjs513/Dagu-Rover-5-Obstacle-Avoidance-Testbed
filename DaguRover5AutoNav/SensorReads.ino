@@ -73,9 +73,16 @@ void read_sensors() {
     
     telem << "IR Distances: " << frtIRdistance << " -- " << rearIRdistance << endl;
     //telem << "IR Distances: " << leftIRdistance << " -- " << endl;
+
+	if(cm[1] == MAX_DISTANCE) {
+		if(frtIRdistance <= 0.9 * max_IR_distance ) {
+			cm[1] = frtIRdistance;
+		}
+	}
     
     //compass_update();	
     //getInclination();
+
 
 }
 
@@ -140,6 +147,7 @@ int frtIRaverage(int average_count) {
 	int sum = 0;
 	for (int i=0; i<average_count; i++) {
 		int sensor_value = analogRead(leftIRsensor);  //read the sensor value
+    sensor_value = constrain(sensor_value, 60, 700);
 		int distance_cm = pow(2649.3/sensor_value, 1.2531); //convert readings to distance(cm)
 		sum = sum + distance_cm;
 	}
@@ -150,6 +158,7 @@ int rearIRaverage(int average_count) {
 	int sum = 0;
 	for (int i=0; i<average_count; i++) {
 		int sensor_value = analogRead(rightIRsensor);  //read the sensor value
+    sensor_value = constrain(sensor_value, 60, 700);
 		int distance_cm = pow(2471.5/sensor_value, 1.3123); //convert readings to distance(cm)
 		sum = sum + distance_cm;
 	}
