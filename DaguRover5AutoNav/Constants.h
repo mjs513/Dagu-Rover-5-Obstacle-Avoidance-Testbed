@@ -34,16 +34,17 @@ const boolean fastmode = true;
 //int sideSensorThreshold = 45;	        //50.8,38,45,41,45,36	sonarll (points to right) obs[0]
 //
 //const int obsDist = 27;
-const int obsDist = 27; //was 47
-const int sidedistancelimit = 27;  //
-const int fowardheadThreshold = 27; //was 49, 39, 29
-const int lcThreshold = 26;         // was 47,27
-const int lcIRthreshold = 25;  //was 45, last 47
-const int sideSensorThreshold = 27; //was 42
-const max_IR_distance 80
+const int obsDist = 47; //was 47
+const int sidedistancelimit = 27;  // was 27
+const int fowardheadThreshold = 27; //was 49, 39, 29; was 27
+const int lcThreshold = 26;         // was 47,27; was 27
+const int lcIRthreshold = 25;  //was 45, last 47; was 27
+const int sideSensorThreshold = 27; //was 42; was 27
+const int max_IR_distance = 200;
 
 const int backupSensorThreshold = 17;		//17.78 - not implemented yet
-
+const int backup_high = 500;
+const int backup_low = 100;
 
 //Set Motor Speed
 const int speed = 50;
@@ -58,7 +59,7 @@ const int right_37 = 295;	//was 440 for 37, 295 for 22 deg
 const int left_57 = 461;	//was 571 for 57, 461 for 45
 const int right_57 = 519;	//was 636 for 57, 519 for 45
                                           
-#define M_PI 3.14159
+#define M_PI 3.14159265359
 
 //compass reads
 const int compass_avg_cnt = 20;
@@ -72,9 +73,9 @@ const int head_ldiag = 45;
 const int head_rdiag = 135;
 
 #define SONAR_NUM     4    			// Number or sensors.
-#define MAX_DISTANCE 200   			// Maximum distance (in cm) to ping.
-#define PING_INTERVAL 40   			// Milliseconds between sensor pings (29ms is about the min to avoid cross-sensor echo).
-                                          // was set to 33
+#define MAX_DISTANCE 100   			// Maximum distance (in cm) to ping. was 200
+#define PING_INTERVAL 32   			// Milliseconds between sensor pings (29ms is about the min to avoid cross-sensor echo).
+                                          // was set to 33; was 40
 // the interval in mS 
 //#define interval 7500    //was 7500
 #define interval 100
@@ -87,6 +88,6 @@ const int head_rdiag = 135;
 const float V = 21;
 const float Ki = 0.2;
 
-const int N = 24;  //was 10, 12 for 12 readings, was 12
+const int N = 25;  //was 10, 12 for 12 readings, was 12
 const int angle = 7.5;  //was 20 degrees, was 15 for 12
 

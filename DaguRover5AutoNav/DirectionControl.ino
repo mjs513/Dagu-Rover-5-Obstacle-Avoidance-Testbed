@@ -36,75 +36,91 @@ void decide_direction() {
 	else if(cm[0] < sideSensorThreshold && cm[2] < sideSensorThreshold && 
 			(cm[3] < fowardheadThreshold || cm[1] < lcThreshold 
 			|| frtIRdistance < lcIRthreshold)) {
+		
 		//If I have to move backward 1st test to see to see if there is a obstacle
 		//if no obstacle move a lot, if obstacle move a little and then run the bubble
 		//rebound algorithm
 		if(rearIRdistance > backupSensorThreshold) {
 			mBackward();
-			delay(500);
+			delay(backup_high);
 			mStop();
+			lastMove == "Backup";
 		} else {
 			mBackward();
-			delay(100);
+			delay(backup_low);
 			mStop();
+			lastMove == "Backup";
 		}    
 		nextMove = "RunBubble";
 		telem << "(DC) Everything blocked Next Move Backup" << endl;
 	}
-
+	
 	// Do any of the front facing range sensors detect an obstacle closer than their
 	// threshold?  If so, then prepare to turn left or right. cm[3] < fowardheadThreshold ||
 	//else if( cm[1] < lcThreshold || frtIRdistance < lcIRthreshold)
-	else if(frtIRdistance < lcIRthreshold)	
+		
+	// If head sensor is blocked (less than threshold) run bubble and be done with iter_swap
+	else if(cm[3] < fowardheadThreshold) {
+		nextMove = "RunBubble";
+	}
+	
+	else if(frtIRdistance < lcIRthreshold || cm[1] < lcThreshold)	
 	{
 		//If I have to move backward 1st test to see to see if there is a obstacle
 		//if no obstacle move a lot, if obstacle move a little and then run the bubble
 		//rebound algorithm
 		if(rearIRdistance > backupSensorThreshold) {
 			mBackward();
-			delay(500);
+			delay(backup_high);
 			mStop();
+			lastMove == "Backup";
 		} else {
 			mBackward();
-			delay(100);		//was 250
+			delay(backup_low);		//was 250
 			mStop();
+			lastMove == "Backup";
 		}   
 		//nextMove = "RunBubble";
-		if(cm[0] > cm[2]) {
-				//nextMove = "Left";
-				turn_time = left_57;  //was 37
+
+		if(cm[0] > cm[2]) {				//If left  is greater than right distance move left
+				nextMove = "Left";
+				turn_time = left_57;  	//was 37
 				telem << "(DC) Next Move is left (Center Blocked)" << endl;
-				mLeft();
-				delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
-				mStop();
-				nextMove = "Straight";
-		} else if(cm[2] < cm[0]){
-				//nextMove = "Right";
+				//mLeft();
+				//delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
+				//mStop();
+				//nextMove = "Straight";
+		} else if(cm[2] < cm[0]){		//If right is greater than left distance move right
+				nextMove = "Right";
 				turn_time = right_57; //was 37
 				telem << "(DC) Next Move is right (Center Blocked)" << endl;
-				mRight();
-				delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
-				mStop();
-				nextMove = "Straight";
-		} else {
+				//mRight();
+				//delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
+				//mStop();
+				//nextMove = "Straight";
+		} else {						//if all else fails run bubble band algorithm
 			nextMove = "RunBubble";
 		}
 		//telem << "(DC) Next Move Determined by bubble [fwd sensors blocked - backup first]" << endl;
 	}
 
 	// What about the angled looking  detectors?
+	// If right and center distances is less than threshold move left alot
 	else if(cm[2] < sideSensorThreshold && cm[1] < lcThreshold){
 		nextMove = "Left";
 		turn_time = left_57;
 		telem << "(DC) Next Move alot Left" << endl;
 	}
 	
+	// If left and center distances is less than threshold move right alot
 	else if(cm[0] < sideSensorThreshold && cm[1] < lcThreshold){
 		nextMove = "Right";
 		turn_time = right_57;
 		telem << "(DC) Next Move alot Right" << endl;
 	}
-
+	
+	// If right distances is less than threshold and center not blocked 
+	// move left a little
 	else if (cm[2] < sideSensorThreshold && cm[1] > lcThreshold)
 	{
 		nextMove = "Left";
@@ -112,8 +128,8 @@ void decide_direction() {
 		telem << "(DC) Next Move Left" << endl;
 	}
 	//
-	// if right facing sensor (left side pointing to the right)
-	// is block turn to the left
+	// If left distance is less than threshold and center not blocked 
+	// move right a little
 	//
 	else if(cm[0] < sideSensorThreshold && cm[1] > lcThreshold)
 	{
@@ -134,6 +150,14 @@ void decide_direction() {
 		// lets stop and figure out what's next
 		mStop();
 		
+		if(lastMove == "Right" && nextMove == "Left") {
+			nextMove == "Right";
+		}
+		
+		if(lastMove == "Left" && nextMove == "Right") {
+			nextMove == "Left";
+		}
+		
 		if (nextMove == "Right") {
             //nextTurn = -1;  //turn CCW
 			mRight();
@@ -149,10 +173,13 @@ void decide_direction() {
 			nextTurn = 1;	  //turn CW
 		}
 		
+		lastMove = nextMove;		
+		
 		if (nextMove == "RunBubble") {
 			Select_Direction();
 		}
-		
+
+    
     } else {
 		// If no obstacles are detected close by, keep going straight ahead.
 		lastMove = "Straight";

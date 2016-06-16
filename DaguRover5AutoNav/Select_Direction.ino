@@ -90,8 +90,9 @@ void Select_Direction() {
         Hist[i] = 1;
        else
         Hist[i] = 0;
-        //telem <<  Hist[i] << ", " << sonar_dist[i] << endl;   
-        //telem << sonar_dist[i] << ", ";  
+        telem << i*angle << ", ";
+        telem <<  Hist[i] << ", " << sonar_dist[i] << endl;   
+        telem << sonar_dist[i] << ", ";  
         delay(PING_INTERVAL); 
     } 
     telem << endl;
@@ -157,11 +158,11 @@ void Select_Direction() {
     int angle_cnt = 0;
     for(i=0;i < (int)border.size();i++) 
     {
-      telem << "BORDER: " << border[i].first << " ,   " << border[i].second << endl;
+      //telem << "BORDER: " << border[i].first << " ,   " << border[i].second << endl;
       Delta_Angle = border[i].second - border[i].first + angle;
       //telem << "DELTA ANGLE: " << Delta_Angle << endl << endl;
     
-      if (fabs(Delta_Angle) < 22.5)   // was 60, 30
+      if (fabs(Delta_Angle) < 15)   // was 60, 30
       {
         ////////////////////////////////////////////////////
         //
@@ -170,9 +171,8 @@ void Select_Direction() {
         ////////////////////////////////////////////////////
 
         new_angle = border[i].first + (border[i].second - border[i].first) / 2.0;
-        //telem << "DELTA ANGLE: " << Delta_Angle << endl;
-        //telem << "Narrow Opening (New Angle):  " << new_angle << endl;
-
+        telem << "DELTA ANGLE: " << Delta_Angle << endl;
+        telem << "Narrow Opening (New Angle):  " << new_angle << endl;
       } else {
         new_angle =+ (border[i].second - border[i].first) / 2.0;
         telem << "Wide Opening (Center):  " << new_angle << endl;
@@ -191,7 +191,7 @@ void Select_Direction() {
         
         //telem << start_index << ", " << end_index << endl;
         for(int i=start_index; i <= end_index; i++) {
-          numer = numer + radians(angle*i)*sonar_dist[i];
+          numer = numer + radians(angle*i-90.)*sonar_dist[i];
           denom = denom + sonar_dist[i];
         }
 
@@ -206,9 +206,9 @@ void Select_Direction() {
        
         rebound[angle_cnt].second = denom / (end_index-start_index+1);
         rebound[angle_cnt].first = degrees(numer/denom);
-        //telem << "REBOUND ANGLE = " << rebound[angle_cnt].first << " degrees" << endl;
-        //telem << "Average Distance: " << rebound[angle_cnt].second <<endl;  
-        //telem << endl;
+        telem << "REBOUND ANGLE = " << rebound[angle_cnt].first << " degrees" << endl;
+        telem << "Average Distance: " << rebound[angle_cnt].second <<endl;  
+        telem << endl;
         angle_cnt = angle_cnt + 1;
       }
     }
@@ -222,7 +222,7 @@ void Select_Direction() {
     //
     //////////////////////////////////////////////////////
 
-    if(nowidegap == 0) {
+    //if(nowidegap == 0) {
       int maxIndex = 0;
       float maxa = rebound[maxIndex].second;
       for (int i=1; i < angle_cnt; i++){
@@ -232,8 +232,8 @@ void Select_Direction() {
         }
       }
    
-      float rebound_angle = rebound[maxIndex].first - 90;
-      //telem << "Best Angle:  " << rebound_angle << endl;
+      float rebound_angle = rebound[maxIndex].first;
+      telem << "Best Angle:  " << rebound_angle << endl;
 
       //////////////////////////////////////////////////
       //
@@ -243,10 +243,10 @@ void Select_Direction() {
       //////////////////////////////////////////////////
 
       compass_update(); 
-      //telem << "Current heading: " << yar_heading << endl; 
+      telem << "Current heading: " << yar_heading << endl; 
   
       float new_heading = yar_heading + (rebound_angle);
-      //telem << "Actual calc for new heading: " << new_heading << endl;
+      telem << "Actual calc for new heading: " << new_heading << endl;
   
       if(new_heading > 360.0f)
          new_heading -= 360.0f;
@@ -267,9 +267,9 @@ void Select_Direction() {
       angle_delta = abs(new_heading - yar_heading);
       clockwise = (rebound_angle >= 0.0f);
   
-      //telem << "New Heading: " << new_heading << "  Clockwise: " << clockwise << endl;
-      //telem << "Angle delta: " << angle_delta << endl;
-      //telem << endl;
+      telem << "New Heading: " << new_heading << "  Clockwise: " << clockwise << endl;
+      telem << "Angle delta: " << angle_delta << endl;
+      telem << endl;
 
       ////////////////////////////////////////////////////////
       //
@@ -287,6 +287,7 @@ void Select_Direction() {
         //telem << "Curve Fit (CW): " << fit_time << endl;
         if(delay_time < 100) delay_time = 100;
         mRight(); 
+        lastMove = "Right";
       } else {
         //fit_time = -0.00001*pow(rebound_angle,3)-0.015*pow(rebound_angle,2)-9.7223*rebound_angle+32.217;
         fit_time = (rebound_angle-5.255)/(-0.109);
@@ -294,6 +295,7 @@ void Select_Direction() {
         //telem << "Curve Fit (CCW): " << fit_time << endl;      
         if(delay_time < 100) delay_time = 100;  // was 50
         mLeft();
+        lastMove = "Left";
       }
   
       //telem << "Turn Time: " << delay_time << endl;
@@ -302,18 +304,18 @@ void Select_Direction() {
     
       compass_update();
       //telem << "New Heading: " << yar_heading << endl;
-    } else {
+//    } else {
       //telem << "No viable (wide) gap !" << endl;
       
       // Do a clockwise 180 and return
-      float rebound_angle = 180;
+//      float rebound_angle = 180;
       //fit_time = 0.000006*pow(rebound_angle,3)-0.0081*pow(rebound_angle,2)+7.1036*rebound_angle+84.232;
-	  fit_time = (rebound_angle+8.2371)/0.1026;
-      delay_time = ceil(fit_time);
+//	  fit_time = (rebound_angle+8.2371)/0.1026;
+//      delay_time = ceil(fit_time);
       //telem << "180 Curve Fit (CW): " << fit_time << endl;
-      mRight();
-      delay(delay_time);
-    }
+//      mRight();
+ //     delay(delay_time);
+ //   }
 }
 
 
