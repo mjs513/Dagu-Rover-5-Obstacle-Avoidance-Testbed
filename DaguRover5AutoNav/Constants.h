@@ -41,6 +41,7 @@ const int lcThreshold = 26;         // was 47,27; was 27
 const int lcIRthreshold = 25;  //was 45, last 47; was 27
 const int sideSensorThreshold = 27; //was 42; was 27
 const int max_IR_distance = 200;
+int turnCounter = 0;
 
 const int backupSensorThreshold = 17;		//17.78 - not implemented yet
 const int backup_high = 500;

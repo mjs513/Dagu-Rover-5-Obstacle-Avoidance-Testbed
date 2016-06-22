@@ -60,11 +60,12 @@ void decide_direction() {
 	//else if( cm[1] < lcThreshold || frtIRdistance < lcIRthreshold)
 		
 	// If head sensor is blocked (less than threshold) run bubble and be done with iter_swap
-	else if(cm[3] < fowardheadThreshold) {
-		nextMove = "RunBubble";
-	}
+	//else if(cm[3] < fowardheadThreshold) {
+	//	nextMove = "RunBubble";
+	//}
 	
-	else if(frtIRdistance < lcIRthreshold || cm[1] < lcThreshold)	
+	else if(frtIRdistance < lcIRthreshold || cm[1] < fowardheadThreshold
+		|| cm[3] < fowardheadThreshold)	
 	{
 		//If I have to move backward 1st test to see to see if there is a obstacle
 		//if no obstacle move a lot, if obstacle move a little and then run the bubble
@@ -82,7 +83,7 @@ void decide_direction() {
 		}   
 		//nextMove = "RunBubble";
 
-		if(cm[0] > cm[2]) {				//If left  is greater than right distance move left
+		if(cm[0] >= cm[2]) {				//If left  is greater than right distance move left
 				nextMove = "Left";
 				turn_time = left_57;  	//was 37
 				telem << "(DC) Next Move is left (Center Blocked)" << endl;
@@ -90,7 +91,7 @@ void decide_direction() {
 				//delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
 				//mStop();
 				//nextMove = "Straight";
-		} else if(cm[2] < cm[0]){		//If right is greater than left distance move right
+		} else if(cm[2] >= cm[0]){		//If right is greater than left distance move right
 				nextMove = "Right";
 				turn_time = right_57; //was 37
 				telem << "(DC) Next Move is right (Center Blocked)" << endl;
@@ -100,20 +101,21 @@ void decide_direction() {
 				//nextMove = "Straight";
 		} else {						//if all else fails run bubble band algorithm
 			nextMove = "RunBubble";
+			telem << "(DC) Next Move Determined by bubble [fwd sensors blocked - backup first]" << endl;
+
 		}
-		//telem << "(DC) Next Move Determined by bubble [fwd sensors blocked - backup first]" << endl;
 	}
 
 	// What about the angled looking  detectors?
 	// If right and center distances is less than threshold move left alot
-	else if(cm[2] < sideSensorThreshold && cm[1] < lcThreshold){
+	else if(cm[2] < sideSensorThreshold && cm[1] < fowardheadThreshold){
 		nextMove = "Left";
 		turn_time = left_57;
 		telem << "(DC) Next Move alot Left" << endl;
 	}
 	
 	// If left and center distances is less than threshold move right alot
-	else if(cm[0] < sideSensorThreshold && cm[1] < lcThreshold){
+	else if(cm[0] < sideSensorThreshold && cm[1] < fowardheadThreshold){
 		nextMove = "Right";
 		turn_time = right_57;
 		telem << "(DC) Next Move alot Right" << endl;
@@ -121,7 +123,7 @@ void decide_direction() {
 	
 	// If right distances is less than threshold and center not blocked 
 	// move left a little
-	else if (cm[2] < sideSensorThreshold && cm[1] > lcThreshold)
+	else if (cm[2] < sideSensorThreshold && cm[1] > fowardheadThreshold)
 	{
 		nextMove = "Left";
 		turn_time = left_37;
@@ -131,7 +133,7 @@ void decide_direction() {
 	// If left distance is less than threshold and center not blocked 
 	// move right a little
 	//
-	else if(cm[0] < sideSensorThreshold && cm[1] > lcThreshold)
+	else if(cm[0] < sideSensorThreshold && cm[1] > fowardheadThreshold)
 	{
 		nextMove = "Right";
 		turn_time = right_37;
@@ -139,7 +141,7 @@ void decide_direction() {
 	}
 
 	// Reset the closest obstacle distance to a large value.
-	minDistance = 10000;
+	// minDistance = 10000;
   
 	// If the closest object is too close, then get ready to back up.
 	//if (minDistance < backupSensorThreshold) nextMove = "Backup";
@@ -152,41 +154,51 @@ void decide_direction() {
 		
 		if(lastMove == "Right" && nextMove == "Left") {
 			nextMove == "Right";
-		}
-		
-		if(lastMove == "Left" && nextMove == "Right") {
+			turn_time = right_57;
+			turnCounter = turnCounter + 1;
+			telem << "(OSC) Next Move Right" << endl;
+		 } else if(lastMove == "Left" && nextMove == "Right") {
 			nextMove == "Left";
+			turn_time = left_57;
+			turnCounter = turnCounter + 1;
+			telem << "(OSC) Next Move Left" << endl;
+		  }
+		if(turnCounter != 0){
+			nextMove = lastMove;
 		}
 		
 		if (nextMove == "Right") {
             //nextTurn = -1;  //turn CCW
 			mRight();
-			delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
+			//delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
+			while(turn_timer < turn_time){
+				getCurrent();
+			}
+			turn_timer = 0;
 			mStop();			
-		}
-		
-		if (nextMove == "Left") { 
-            //nextTurn = -1;  //turn CCW
-			mLeft();
-			delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
-			mStop();	        
-			nextTurn = 1;	  //turn CW
-		}
-		
+		 } else if (nextMove == "Left") { 
+			  //nextTurn = -1;  //turn CCW
+			  mLeft();
+			  //delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
+			  while(turn_timer < turn_time){
+				getCurrent();
+			  }
+			  turn_timer = 0;
+			  mStop();	        
+			  nextTurn = 1;	  //turn CW
+		   } else if (nextMove == "RunBubble") {
+				turnCounter = 0;
+				Select_Direction();
+			 }
+		   
 		lastMove = nextMove;		
-		
-		if (nextMove == "RunBubble") {
-			Select_Direction();
-		}
-
     
     } else {
 		// If no obstacles are detected close by, keep going straight ahead.
 		lastMove = "Straight";
-       
+
 		//reset counters after clearing obstacle
-		leftCounter = 0;
-		rightCounter = 0;
+        turnCounter = 0;
 		
 		mForward();
        

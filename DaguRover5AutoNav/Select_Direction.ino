@@ -299,7 +299,11 @@ void Select_Direction() {
       }
   
       //telem << "Turn Time: " << delay_time << endl;
-      delay(delay_time);
+      //delay(delay_time);
+	  while(turn_timer < turn_time){
+		getCurrent();
+		}
+	  turn_timer = 0;
       mStop();
     
       compass_update();

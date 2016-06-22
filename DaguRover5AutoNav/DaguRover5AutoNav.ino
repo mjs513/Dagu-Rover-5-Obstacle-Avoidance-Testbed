@@ -102,6 +102,7 @@ elapsedMillis motorFwd;
 elapsedMillis motorFwdRunTime;
 elapsedMillis motorTurnTime;
 elapsedMillis motorRevTime;
+elapsedMillis turn_timer;
 
 // the interval in mS 
 unsigned long currentTime;
@@ -116,7 +117,6 @@ uint8_t obs_array[5];
 unsigned int cm_head[5];
 
 int frtIRdistance, rearIRdistance;
-int leftCounter, rightCounter;
 
 float yar_heading;
 

@@ -63,7 +63,7 @@ Encoder encD(encD1, encD2);  // lr
 //////////////////////////////////////////////////////
 
 
-const int HeadServopin = 8; // signal input of headservo
+const int HeadServopin = 11; // signal input of headservo, was 8.
 //const int head_tilt_pin = 3; // signal input for headservo tilt
 
 NewPing sonarll(34, 35, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
