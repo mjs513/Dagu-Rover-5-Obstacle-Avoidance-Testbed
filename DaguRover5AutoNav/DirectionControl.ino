@@ -37,53 +37,49 @@ void decide_direction() {
 			(cm[3] < fowardheadThreshold || cm[1] < lcThreshold 
 			|| frtIRdistance < lcIRthreshold)) {
 		
-		//If I have to move backward 1st test to see to see if there is a obstacle
-		//if no obstacle move a lot, if obstacle move a little and then run the bubble
-		//rebound algorithm
-		if(rearIRdistance > backupSensorThreshold) {
-			mBackward();
-			delay(backup_high);
-			mStop();
-			lastMove == "Backup";
-		} else {
-			mBackward();
-			delay(backup_low);
-			mStop();
-			lastMove == "Backup";
-		}    
+		moveBackward();
+   
 		nextMove = "RunBubble";
 		telem << "(DC) Everything blocked Next Move Backup" << endl;
 	}
+	
+	// Special Cases
+	else if(cm[0] < sideSensorThreshold && cm[2] == MAX_DISTANCE && 
+			cm[3] < fowardheadThreshold && cm[1] < lcThreshold 
+			&& frtIRdistance < lcIRthreshold) {
+
+		moveBackward();
+		
+		nextMove = "RunBubble";
+		telem << "(DC) Everything blocked Next Move Backup" << endl;
+	}
+
+	else if(cm[2] < sideSensorThreshold && cm[0] == MAX_DISTANCE && 
+			cm[3] < fowardheadThreshold && cm[1] < lcThreshold 
+			&& frtIRdistance < lcIRthreshold) {
+
+		moveBackward();
+		
+		nextMove = "RunBubble";
+		telem << "(DC) Everything blocked Next Move Backup" << endl;
+	}	
 	
 	// Do any of the front facing range sensors detect an obstacle closer than their
 	// threshold?  If so, then prepare to turn left or right. cm[3] < fowardheadThreshold ||
 	//else if( cm[1] < lcThreshold || frtIRdistance < lcIRthreshold)
 		
 	// If head sensor is blocked (less than threshold) run bubble and be done with iter_swap
-	//else if(cm[3] < fowardheadThreshold) {
+	// else if(cm[3] < fowardheadThreshold) {
 	//	nextMove = "RunBubble";
 	//}
 	
 	else if(frtIRdistance < lcIRthreshold || cm[1] < fowardheadThreshold
 		|| cm[3] < fowardheadThreshold)	
 	{
-		//If I have to move backward 1st test to see to see if there is a obstacle
-		//if no obstacle move a lot, if obstacle move a little and then run the bubble
-		//rebound algorithm
-		if(rearIRdistance > backupSensorThreshold) {
-			mBackward();
-			delay(backup_high);
-			mStop();
-			lastMove == "Backup";
-		} else {
-			mBackward();
-			delay(backup_low);		//was 250
-			mStop();
-			lastMove == "Backup";
-		}   
+		moveBackward();  
 		//nextMove = "RunBubble";
 
-		if(cm[0] >= cm[2]) {				//If left  is greater than right distance move left
+		if(cm[0] > cm[2]) {				//If left  is greater than right distance move left
 				nextMove = "Left";
 				turn_time = left_57;  	//was 37
 				telem << "(DC) Next Move is left (Center Blocked)" << endl;
@@ -167,23 +163,26 @@ void decide_direction() {
 			nextMove = lastMove;
 		}
 		
+		telem << "Actual Move: " << nextMove << endl << endl;
+		
+		turn_timer = 0;
 		if (nextMove == "Right") {
             //nextTurn = -1;  //turn CCW
 			mRight();
-			//delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
-			while(turn_timer < turn_time){
-				getCurrent();
-			}
-			turn_timer = 0;
+			delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
+			//while(turn_timer < turn_time){
+			//	getCurrent();
+			//}
+			//turn_timer = 0;
 			mStop();			
 		 } else if (nextMove == "Left") { 
 			  //nextTurn = -1;  //turn CCW
 			  mLeft();
-			  //delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
-			  while(turn_timer < turn_time){
-				getCurrent();
-			  }
-			  turn_timer = 0;
+			  delay(turn_time);     //was 1500, 700, 225 - calc at 275 change to 325
+			  //while(turn_timer < turn_time){
+				//getCurrent();
+			  //}
+			  //turn_timer = 0;
 			  mStop();	        
 			  nextTurn = 1;	  //turn CW
 		   } else if (nextMove == "RunBubble") {
@@ -222,5 +221,22 @@ void decide_direction() {
     }
 }   
 
-
+void moveBackward() {
+		//If I have to move backward 1st test to see to see if there is a obstacle
+		//if no obstacle move a lot, if obstacle move a little and then run the bubble
+		//rebound algorithm
+		
+		telem << "Moving Backward to avoid obstacle" << endl;
+		if(rearIRdistance > backupSensorThreshold) {
+			mBackward();
+			delay(backup_high);
+			mStop();
+			lastMove == "Backup";
+		} else {
+			mBackward();
+			delay(backup_low);
+			mStop();
+			lastMove == "Backup";
+		} 
+}
 

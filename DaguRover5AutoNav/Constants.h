@@ -53,7 +53,7 @@ const int turnSpeed = 150;
 int turn_time_mult = 2;
 int turn_time;
 
-#define v2Amps (5/1023)
+#define v2Amps (4/1023)
 
 const int left_37 = 250;	//was 387 for 37 deg, 250 for 22deg
 const int right_37 = 295;	//was 440 for 37, 295 for 22 deg
