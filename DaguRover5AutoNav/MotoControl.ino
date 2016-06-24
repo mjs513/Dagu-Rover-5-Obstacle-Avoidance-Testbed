@@ -107,18 +107,10 @@ void getTicks_noreset(){
 }
 
 void getCurrent() {
-      telem.print("LF-Current: ");
-      telem.println(float(analogRead(CURRENTLF))*v2Amps);
-      
-      telem.print("RR-Current: ");
-      telem.println(analogRead(CURRENTRR)*v2Amps);
-      
-      telem.print("LR-Current: ");
-      telem.println(analogRead(CURRENTLR)*v2Amps);
-      
-      telem.print("RF-Current: ");
-      telem.println(analogRead(CURRENTRR)*v2Amps);
-	  
-	  telem.println();
+      telem << "LF-Current: " << _FLOAT(analogRead(CURRENTLF)*v2Amps,3) << endl;
+      telem << "RF-Current: " << _FLOAT(analogRead(CURRENTRF)*v2Amps,3) << endl; 
+      telem << "LR-Current: " << _FLOAT(analogRead(CURRENTLR)*v2Amps,3) << endl;
+      telem << "RR-Current: " << _FLOAT(analogRead(CURRENTRR)*v2Amps,3) << endl;
+	    telem << endl;
 
 }

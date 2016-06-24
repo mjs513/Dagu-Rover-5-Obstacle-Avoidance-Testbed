@@ -213,10 +213,10 @@ void decide_direction() {
 					return;
 				}
 			}
-			telem << "(DC) End of Tests Updating Sensors" << endl << endl;          
+			telem << "(DC) End of Tests Updating Sensors" << endl << endl;         
 			read_sensors();   
 			oneSensorCycle();          
-		}    
+		}   
 		mStop();
     }
 }   
