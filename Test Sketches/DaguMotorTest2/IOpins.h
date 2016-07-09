@@ -9,7 +9,6 @@ const int dir_rr = 42;  //DIR for CH4
 const int dir_lr = 44;  //DIR for CH2
 const int dir_rf = 43;  //DIR for CH3
 
-
 //Current Sensors
 const int CURRENTLF = A12; 
 const int CURRENTRR = A13; 
@@ -33,7 +32,7 @@ const int encD2 = 49;
 //   Good Performance: only the first pin has interrupt capability
 //   Low Performance:  neither pin has interrupt capability
 Encoder encA(encA1, encA2);  // lf
-Encoder encB(encB1, encB2);
+Encoder encB(encB1, encB2);  // rf
 Encoder encC(encC1, encC2);  // rr
 Encoder encD(encD1, encD2);  // lr
 

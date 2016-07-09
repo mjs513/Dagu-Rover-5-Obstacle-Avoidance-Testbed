@@ -221,14 +221,14 @@ void loop(){
         motorFwd = 0;
         
 		telem.println("Rolling Forward!");
+      encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+    getTicks_noreset();
 		mForward();
         
 		//Read Encoders and current sense
-		// TBD
 		//
 		//////////////////////////////////
        while(motorFwdRunTime < defaultFwdTime){
-    
         //Replace with Run once or other lib.
         //currentTime = millis();
         if(motorFwd > 200){
@@ -243,6 +243,8 @@ void loop(){
         }
        }
       mStop(); 
+      getTicks_noreset();
+      
       motorFwdRunTime = 0;
       break;
       

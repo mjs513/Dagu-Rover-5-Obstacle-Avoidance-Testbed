@@ -20,10 +20,10 @@ float roll, pitch;
 float fXg = 0;
 float fYg = 0;
 float fZg = 0;
-
+int roam = 0;
 
 #include "IOpins.h"
-
+#include <elapsedMillis.h>
 //telem input
 #define telem Serial
 //#define telem Serial3 // bluetooth
@@ -53,47 +53,19 @@ const byte CCW = 1;
 unsigned time = millis();
 
 long oldPosition  = -999;
+//Set Motor Speed
+const int speed = 50;
+const int turnSpeed = 150; 
+int turn_time_mult = 2;
+int turn_time;
 
-void runCommand(){
-  
-    arg1 = atoi(argv1);
-    arg2 = atoi(argv2);
-    
-    switch (cmd){
-    
-      case 'f':
-            telem.print("Forward: ");  
-            telem.println(arg1);   
-            mForward(arg1);
-      break;
-      
-      case 'l':
-          telem.print("Left: "); 
-          telem.println(arg1);  
-          mLeft(arg1); 
-      break;
-      
-      case 'r':
-         telem.print("Right: ");
-         telem.println(arg1);
-         mRight(arg1);     
-      break;
-      
-      case 'b':
-        telem.print("Reverse: "); 
-        telem.println(arg1); 
-        mReverse(arg1);      
-      break;
-      
-      case 's':
-        mStop();
-        telem.println("Stopped");
-      break;
-  }
-  
-  resetCommand();
+elapsedMillis motorFwd;
+elapsedMillis motorFwdRunTime;
+elapsedMillis motorTurnTime;
+elapsedMillis motorRevTime;
+elapsedMillis turn_timer;
 
-}
+
 
 void resetCommand() { 
    cmd = NULL; 
@@ -156,66 +128,151 @@ void setup(){
 
 void loop(){
   while (telem.available() > 0) {
-    
-    // Read the next character
-    chr = telem.read();
+    int val = telem.read();  //read telem input commands
 
-    // Terminate a command with a CR
-    if (chr == 13) {
-      if (arg == 1) argv1[index_] = NULL;
-      else if (arg == 2) argv2[index_] = NULL;
-      runCommand();
-      resetCommand();
-    }
-    // Use spaces to delimit parts of the command
-    else if (chr == ' ') {
-      // Step through the arguments
-      if (arg == 0) arg = 1;
-      else if (arg == 1)  {
-        argv1[index_] = NULL;
-        arg = 2;
-        index_ = 0;
-      }
-      continue;
-    }
-    else {
-      if (arg == 0) {
-        // The first arg is the single-letter command
-        cmd = chr;
-      }
-      else if (arg == 1) {
-        // Subsequent arguments can be more than one character
-        argv1[index_] = chr;
-        index_++;
-      }
-      else if (arg == 2) {
-        argv2[index_] = chr;
-        index_++;
-      }
-    }
-  }
+    turn_time_mult = telem.parseInt();
+    if(turn_time_mult == 0)
+                turn_time_mult = 4;          
 
-
-  
-  if (boolMove){
+    switch(val)
+    {
+      case 'f' : 
+        motorFwdRunTime = 0;
+        motorFwd = 0;
+        
+    telem.println("Rolling Forward!");
+    mForward();
+        
+    //Read Encoders and current sense
+    // TBD
+    //
+    //////////////////////////////////
+       while(motorFwdRunTime < defaultFwdTime){
+      if (boolMove){
     if(millis() > (time+500)){
-      telem.print("LF-Current: ");
-      telem.println(analogRead(CURRENTLF));
+      //telem.print("LF-Current: ");
+      //telem.println(analogRead(CURRENTLF));
       
-      telem.print("RR-Current: ");
-      telem.println(analogRead(CURRENTRR));
+      //telem.print("RR-Current: ");
+      //telem.println(analogRead(CURRENTRR));
       
-      telem.print("LR-Current: ");
-      telem.println(analogRead(CURRENTLR));
+      //telem.print("LR-Current: ");
+      //telem.println(analogRead(CURRENTLR));
       
-      telem.print("RF-Current: ");
-      telem.println(analogRead(CURRENTRR));
+      //telem.print("RF-Current: ");
+      //telem.println(analogRead(CURRENTRR));
 
       //compass_update();
+    
+    getTicks_noreset();
         
       time=millis();
     }
   }
 }
+
+        //Replace with Run once or other lib.
+        //currentTime = millis();
+        //if(motorFwd > 200){
+          //Cycle through obstacle avoidance sensors for emergency stop
+          //read_sensors();
+          //oneSensorCycle();
+          //if(obs_array[3] == 1 || obs_array[0] == 1 || obs_array[1] == 1 || obs_array[2] == 1) {
+          //  mStop();
+          //  break; 
+          //}
+          //motorFwd = 0;
+        //}
+       }
+      mStop(); 
+      motorFwdRunTime = 0;
+      break;
+      
+    case 'l' :
+      motorTurnTime = 0;
+      //===================================================
+      // Used for turn calibration curve
+      //===================================================
+      //compass_update();
+      //telem << "Current heading: " << yar_heading << endl;
+      //telem << "Turn Multiplier: " << turn_time_mult << endl;
+      telem.println("Turning Left!");
+      mLeft();
+      //delay(400);  //was 2000
+      delay(turn_time_mult * 100);
+      mStop();
+      //compass_update();
+      //telem << "Changed heading: " << yar_heading << endl;
+      while(motorTurnTime < defaultTurnTime) {
+       }
+      mStop();
+      motorTurnTime = 0;
+      break;
+
+    case 'r' :
+      //===================================================
+      // Used for turn calibration curve
+      //===================================================
+      //telem << "Turn Multiplier: " << turn_time_mult << endl;
+      //telem.println("Turning Right!");
+      //compass_update();
+      //telem << "Current heading: " << yar_heading << endl;
+      mRight();
+      //delay(400);
+      delay(turn_time_mult * 100);
+      mStop();
+      //compass_update();
+      //telem << "Changed heading: " << yar_heading << endl;
+      while(motorTurnTime < defaultTurnTime) {
+        }
+      mStop();
+      break;
+             
+   case 'b' :
+      motorRevTime = 0;    
+      telem.println("Moving Backward!");
+      //moveBackward(motorSpeed);
+      mReverse();
+      while(motorRevTime < defaultRevTime) {
+        }
+      mStop();
+      motorRevTime = 0;
+      break;
+      
+   case 's' :      
+      telem.println("Stop!");
+      mStop();
+      break;
+   case 't' :      
+      telem.println("toggle Roam Mode"); 
+      toggleRoam();
+      break;
+    }      
+    delay(1);  
+    telem.println("I'm Ready to receive telem Commands![f, b, r, l, s, t]"); // Tell us I"m ready
+  }
+      
+  if(roam == 0){ 
+      //just listen for telem commands and wait
+      }
+  else if(roam == 1){  //If roam active- drive autonomously
+    //goRoam();
+    }     
+}
+
+void toggleRoam(){
+  // This method chooses to make the robot roam or else use the telem command input.
+  if(roam == 0){
+   roam = 1;
+   telem.println("Activated Roam Mode");
+  } else {
+    roam = 0;
+    mStop();
+    telem.println("De-activated Roam Mode");
+  }
+}
+
+
+  
 
 

@@ -41,8 +41,8 @@ void mForward() {
   digitalWrite(dir_lr, CCW);    
   digitalWrite(dir_rf, CW);
   
-  analogWrite (pwm_lf, speed);
-  analogWrite (pwm_rr, speed);
+  analogWrite (pwm_lf, speed*1.3);
+  analogWrite (pwm_rr, speed*0.97);
   analogWrite (pwm_lr, speed);
   analogWrite (pwm_rf, speed);  
   
@@ -103,7 +103,7 @@ void getTicks_noreset(){
   
   telem.println(ticksLF);  telem.println(ticksRF);
   telem.println(ticksLR);  telem.println(ticksRR);
-
+  telem.println();
 }
 
 void getCurrent() {

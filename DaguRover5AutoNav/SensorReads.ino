@@ -22,6 +22,7 @@
 //============================================================================
 
 void oneSensorCycle() { // Sensor ping cycle complete, do something with the results.
+  int start = millis();
   telem << "Distance: ";
   for (uint8_t i = 0; i < SONAR_NUM; i++) {
     telem <<  cm[i] << "cm, ";
@@ -36,10 +37,12 @@ void oneSensorCycle() { // Sensor ping cycle complete, do something with the res
     //telem << obs_array[i] << ", ";
   }
   //telem << endl;
+  Serial.println(millis()-start);
   
 }
 
 void read_sensors() {
+  int start = millis();
     cm[0] = 0;  
     unsigned int uS = sonarll.ping();
     //unsigned int uS = sonarll.ping_median();
@@ -82,7 +85,7 @@ void read_sensors() {
     
     //compass_update();	
     //getInclination();
-
+Serial.println(millis()-start);
 
 }
 

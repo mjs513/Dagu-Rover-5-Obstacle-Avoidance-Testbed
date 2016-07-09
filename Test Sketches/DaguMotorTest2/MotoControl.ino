@@ -4,7 +4,7 @@
 //Dagu4Motor motor3(pwm_c, dir_c, CURRENTC); 
 //Dagu4Motor motor4(pwm_d, dir_d, CURRENTD); 
 
-void mReverse(int speed)
+void mReverse()
 {  
   digitalWrite(dir_lf, CCW);  
   digitalWrite(dir_rr, CW);
@@ -21,7 +21,7 @@ void mReverse(int speed)
 }
 
 
-void mForward(int speed)
+void mForward()
 {
   
   digitalWrite(dir_lf, CW);  
@@ -38,7 +38,7 @@ void mForward(int speed)
 
 }
 
-void mLeft(int speed)
+void mLeft()
 {
   digitalWrite(dir_lf, CCW);  
   digitalWrite(dir_rr, CCW); 
@@ -53,7 +53,7 @@ void mLeft(int speed)
   boolMove = true;
 }
 
-void mRight(int speed)
+void mRight()
 {
   digitalWrite(dir_lf, CW);  
   digitalWrite(dir_rr, CW); 
@@ -89,4 +89,24 @@ void mStop()
   
 }
 
+void getTicks_reset(){
+  int ticksLF = encA.read();
+  int ticksRF = encB.read();
+  int ticksRR = encC.read();
+  int ticksLR = encD.read();
+  
+  telem.println(ticksLF);  telem.println(ticksRF);
+  telem.println(ticksLR);  telem.println(ticksRR);
+  encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+}
 
+void getTicks_noreset(){
+  int ticksLF = encA.read();
+  int ticksRF = encB.read();
+  int ticksRR = encC.read();
+  int ticksLR = encD.read();
+  
+  telem.println(ticksLF);  telem.println(ticksRF);
+  telem.println(ticksLR);  telem.println(ticksRR);
+
+}
