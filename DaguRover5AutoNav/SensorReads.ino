@@ -85,7 +85,7 @@ void read_sensors() {
     
     //compass_update();	
     //getInclination();
-Serial.println(millis()-start);
+telem.println(millis()-start);
 
 }
 
