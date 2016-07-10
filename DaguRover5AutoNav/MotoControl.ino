@@ -41,9 +41,9 @@ void mForward() {
   digitalWrite(dir_lr, CCW);    
   digitalWrite(dir_rf, CW);
   
-  analogWrite (pwm_lf, speed*1.3);
+  analogWrite (pwm_lf, speed*1.3*1.15);
   analogWrite (pwm_rr, speed*0.97);
-  analogWrite (pwm_lr, speed);
+  analogWrite (pwm_lr, speed*1.15);
   analogWrite (pwm_rf, speed);  
   
 }
