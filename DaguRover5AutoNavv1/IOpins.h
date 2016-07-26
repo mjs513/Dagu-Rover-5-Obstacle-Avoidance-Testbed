@@ -77,3 +77,13 @@ NewPing sonarhd(39, 38, MAX_DISTANCE); // NewPing setup of pins and maximum dist
 const int leftIRsensor = A3;
 const int rightIRsensor = A2;
 
+// Assign your rc channel in pins
+int THROTTLE_IN_PIN = 51;
+int STEERING_IN_PIN = 50;
+
+
+
+
+
+
+

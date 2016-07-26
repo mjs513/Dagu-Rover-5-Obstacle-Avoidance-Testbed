@@ -210,12 +210,14 @@ void decide_direction() {
 			telem << "(DC) End of Tests Updating Sensors" << endl << endl;         
 			read_sensors();   
 			oneSensorCycle();
-      telem.print(F("Lat="));   telem.print(Lat.value()); 
-      telem.print(F(" Long=")); telem.print(Long.value()); 
-      telem.print(F(" SOG="));  telem.print(SOG.value()); 
-      telem.print(F(" COG="));  telemial.println(COG.value());
-
-      if(ss.available() > 0) 
+      //if (Lat.isUpdated() || Long.isUpdated() || SOG.isUpdated() || COG.isUpdated())
+      //{
+        telem.print(F("Lat="));   telem.print(Lat.value()); 
+        telem.print(F(" Long=")); telem.print(Long.value()); 
+        telem.print(F(" SOG="));  telem.print(SOG.value()); 
+        telem.print(F(" COG="));  telem.println(COG.value());
+      //}
+      while (ss.available() > 0) 
           gps.encode(ss.read());          
 		}   
 		mStop();
@@ -240,4 +242,11 @@ void moveBackward() {
 			lastMove == "Backup";
 		} 
 }
+
+
+
+
+
+
+
 

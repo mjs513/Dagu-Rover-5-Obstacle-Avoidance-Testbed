@@ -85,8 +85,6 @@ void read_sensors() {
     
     //compass_update();	
     //getInclination();
-telem.println(millis()-start);
-
 }
 
 void compass_update() {
@@ -189,4 +187,11 @@ void getInclination() {
       //telem << endl << pitch << ",  " << roll << endl;
 
 }
+
+
+
+
+
+
+
 

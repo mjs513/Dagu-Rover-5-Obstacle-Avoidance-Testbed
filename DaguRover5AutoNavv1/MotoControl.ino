@@ -28,11 +28,10 @@ void mBackward()
   digitalWrite(dir_lr, CW);    
   digitalWrite(dir_rf, CCW);
   
-  analogWrite (pwm_lf, speed*lf_mtr_adj);
-  analogWrite (pwm_rr, speed*rr_mtr_adj);
-  analogWrite (pwm_lr, speed*lr_mtr_adj);
-  analogWrite (pwm_rf, speed*rf_mtr_adj);
-  
+  analogWrite (pwm_lf, throttleLeft*lf_mtr_adj);
+  analogWrite (pwm_rr, throttleRight*rr_mtr_adj);
+  analogWrite (pwm_lr, throttleLeft*lr_mtr_adj);
+  analogWrite (pwm_rf, throttleRight*rf_mtr_adj);
 }
 
 void mForward() {  
@@ -40,11 +39,11 @@ void mForward() {
   digitalWrite(dir_rr, CCW);
   digitalWrite(dir_lr, CCW);    
   digitalWrite(dir_rf, CW);
-  
-  analogWrite (pwm_lf, speed*lf_mtr_adj);
-  analogWrite (pwm_rr, speed*rr_mtr_adj);
-  analogWrite (pwm_lr, speed*lr_mtr_adj);
-  analogWrite (pwm_rf, speed*rf_mtr_adj);  
+    telem.print(throttleLeft); telem.print("   "); telem.println(throttleRight);
+  analogWrite (pwm_lf, throttleLeft*lf_mtr_adj);
+  analogWrite (pwm_rr, throttleRight*rr_mtr_adj);
+  analogWrite (pwm_lr, throttleLeft*lr_mtr_adj);
+  analogWrite (pwm_rf, throttleRight*rf_mtr_adj);
   
 }
 
@@ -53,11 +52,11 @@ void mLeft() {
   digitalWrite(dir_rr, CCW); 
   digitalWrite(dir_lr, CW);  
   digitalWrite(dir_rf, CW);
-  
-  analogWrite (pwm_lf, turnSpeed*lf_mtr_adj);
-  analogWrite (pwm_rr, turnSpeed*rr_mtr_adj);
-  analogWrite (pwm_lr, turnSpeed*lr_mtr_adj);
-  analogWrite (pwm_rf, turnSpeed*rf_mtr_adj);
+    telem.print(throttleLeft); telem.print("   "); telem.println(throttleRight);
+  analogWrite (pwm_lf, throttleLeft*lf_mtr_adj);
+  analogWrite (pwm_rr, throttleRight*rr_mtr_adj);
+  analogWrite (pwm_lr, throttleLeft*lr_mtr_adj);
+  analogWrite (pwm_rf, throttleRight*rf_mtr_adj);
   
 }
 
@@ -67,11 +66,11 @@ void mRight()
   digitalWrite(dir_rr, CW); 
   digitalWrite(dir_lr, CCW);  
   digitalWrite(dir_rf, CCW);
-  
-  analogWrite (pwm_lf, turnSpeed*lf_mtr_adj);
-  analogWrite (pwm_rr, turnSpeed*rr_mtr_adj);
-  analogWrite (pwm_lr, turnSpeed*lr_mtr_adj);
-  analogWrite (pwm_rf, turnSpeed*rf_mtr_adj);
+    telem.print(throttleLeft); telem.print("   "); telem.println(throttleRight);
+  analogWrite (pwm_lf, throttleLeft*lf_mtr_adj);
+  analogWrite (pwm_rr, throttleRight*rr_mtr_adj);
+  analogWrite (pwm_lr, throttleLeft*lr_mtr_adj);
+  analogWrite (pwm_rf, throttleRight*rf_mtr_adj);
   
 }
 
@@ -114,3 +113,8 @@ void getCurrent() {
 	  telem << endl;
 
 }
+
+
+
+
+

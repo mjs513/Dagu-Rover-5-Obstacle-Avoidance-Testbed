@@ -30,6 +30,8 @@
 //Enable 400Khz I2C bus speed
 const boolean fastmode = true;
 
+//GPS Baud Rate
+#define GPSBaud 57600
 
 //int fowardheadThreshold = 52;  	//30.48,41,51,52      headservo - obs[3]
 //int lcThreshold = 50; 	        //40.64,38,45,50      sonarlc obs[1]
@@ -101,4 +103,69 @@ const float Ki = 0.2;
 
 const int N = 25;  //was 10, 12 for 12 readings, was 12
 const int angle = 7.5;  //was 20 degrees, was 15 for 12
+
+//rcarduino constants
+#define RC_NEUTRAL_STEERING 1504  //1504 was 1506
+#define RC_NEUTRAL_THROTTLE 1511  //1500 was 1511
+
+#define RC_MAX_STEERING 1996
+#define RC_MAX_THROTTLE 2000
+
+#define RC_MIN_STEERING 1012  //1012 was 1016
+#define RC_MIN_THROTTLE 1012  //1012 was 1014
+
+#define RC_DEADBAND 100
+
+uint16_t unSteeringMin = RC_MIN_THROTTLE;
+uint16_t unSteeringMax = RC_MAX_STEERING;
+uint16_t unSteeringCenter = RC_NEUTRAL_STEERING;
+
+uint16_t unThrottleMin = RC_MIN_THROTTLE;
+uint16_t unThrottleMax = RC_MAX_THROTTLE;
+uint16_t unThrottleCenter = RC_NEUTRAL_THROTTLE;
+
+		  
+uint16_t ThrottleDeadBandMax = RC_NEUTRAL_THROTTLE + RC_DEADBAND;
+uint16_t ThrottleDeadBandMin = RC_NEUTRAL_THROTTLE - RC_DEADBAND;
+uint16_t SteeringDeadBandMax = RC_NEUTRAL_STEERING + RC_DEADBAND;
+uint16_t SteeringDeadBandMin = RC_NEUTRAL_STEERING - RC_DEADBAND;
+
+#define PWM_MIN 0
+#define PWM_MAX 255
+
+#define GEAR_NONE 0
+#define GEAR_IDLE 1
+#define GEAR_FULL 2
+#define GEAR_NEUTRAL 3
+
+// These bit flags are set in bUpdateFlagsShared to indicate which
+// channels have new signals
+#define THROTTLE_FLAG 1
+#define STEERING_FLAG 2
+
+uint8_t gThrottle = 0;
+uint8_t gGear = GEAR_NONE;
+uint8_t gOldGear = GEAR_NONE;
+
+#define DIRECTION_STOP 0
+#define DIRECTION_FORWARD 1
+#define DIRECTION_REVERSE 2
+#define DIRECTION_ROTATE_RIGHT 3
+#define DIRECTION_ROTATE_LEFT 4
+
+uint8_t gThrottleDirection = DIRECTION_STOP;
+uint8_t gDirection = DIRECTION_STOP;
+uint8_t gOldDirection = DIRECTION_STOP;
+
+#define IDLE_MAX 80
+
+#define MODE_RUN 1
+#define MODE_PROGRAM 0
+
+uint8_t gMode = MODE_RUN;
+uint32_t ulProgramModeExitTime = 0; 
+
+
+
+
 

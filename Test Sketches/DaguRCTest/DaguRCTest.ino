@@ -1,5 +1,9 @@
 #include <PinChangeInt.h>
 
+template <typename T>
+    bool IsInBounds(const T& value, const T& low, const T& high) {
+    return !(value < low) && !(high < value);
+}
 
 // MultiChannel L293D
 //
@@ -58,19 +62,12 @@ uint16_t unThrottleMin = RC_MIN_THROTTLE;
 uint16_t unThrottleMax = RC_MAX_THROTTLE;
 uint16_t unThrottleCenter = RC_NEUTRAL_THROTTLE;
 
-		  
-uint16_t ThrottleDeadBandMax = RC_NEUTRAL_THROTTLE + RC_DEADBAND;
-uint16_t ThrottleDeadBandMin = RC_NEUTRAL_THROTTLE - RC_DEADBAND;
-uint16_t SteeringDeadBandMax = RC_NEUTRAL_STEERING + RC_DEADBAND;
-uint16_t SteeringDeadBandMin = RC_NEUTRAL_STEERING - RC_DEADBAND;
-
 #define PWM_MIN 0
 #define PWM_MAX 255
 
 #define GEAR_NONE 1
 #define GEAR_IDLE 1
 #define GEAR_FULL 2
-#define GEAR_NEUTRAL 3
 
 // Assign your channel in pins
 int THROTTLE_IN_PIN = 51;
@@ -135,7 +132,7 @@ uint8_t gOldDirection = DIRECTION_STOP;
 uint8_t throttleLeft;
 uint8_t throttleRight;
 
-#define IDLE_MAX 60
+#define IDLE_MAX 150
 
 #define MODE_RUN 1
 #define MODE_PROGRAM 0
@@ -167,7 +164,6 @@ void setup()
 
 void loop()
 {
-  Serial.println();
   // create local variables to hold a local copies of the channel inputs
   // these are declared static so that thier values will be retained
   // between calls to loop.
@@ -178,7 +174,7 @@ void loop()
   static uint8_t bUpdateFlags;
 
   // check shared update flags to see if any channels have a new signal
-  Serial.print("Update FLAGS: ");Serial.println(bUpdateFlagsShared);
+  Serial.println(bUpdateFlagsShared);
   if(bUpdateFlagsShared)
   {
     noInterrupts(); // turn interrupts off quickly while we take local copies of the shared variables
@@ -209,8 +205,8 @@ void loop()
     // as soon as interrupts are back on, we can no longer use the shared copies, the interrupt
     // service routines own these and could update them at any time. During the update, the
     // shared copies may contain junk. Luckily we have our local copies to work with :-)
-	
   }
+
 
   // do any processing from here onwards
   // only use the local values unAuxIn, unThrottleIn and unSteeringIn, the shared
@@ -234,38 +230,43 @@ void loop()
       { //Changed unThrottleMax to min
         gThrottle = map(unThrottleIn, unThrottleCenter, unThrottleMin, PWM_MIN, PWM_MAX );
         gThrottleDirection = DIRECTION_FORWARD;
-        Serial.print("Dir_Fwd:"); Serial.println(gThrottle);
       }
       else
       {
-        gThrottle = map(unThrottleIn, unThrottleCenter, unThrottleMax, PWM_MIN, PWM_MAX );
+        gThrottle = map(unThrottleIn, unThrottleMax, unThrottleCenter, PWM_MIN, PWM_MAX );
         gThrottleDirection = DIRECTION_REVERSE;
-        Serial.print("Dir_Rev:"); Serial.println(gThrottle);
       }
  
-      //if(gThrottle < IDLE_MAX && rangeTest(unThrottleIn, ThrottleDeadBandMin, ThrottleDeadBandMax) &&
-		//     rangeTest(unSteeringIn, SteeringDeadBandMin, SteeringDeadBandMax)) {
-		if(gThrottle < IDLE_MAX) {
-			gGear = GEAR_IDLE;
-		//} else if(gThrottle >= IDLE_MAX) {
-		} else if(rangeTest(unThrottleIn, ThrottleDeadBandMin, ThrottleDeadBandMax) &&
-        rangeTest(unSteeringIn, SteeringDeadBandMin, SteeringDeadBandMax)) {
-      gGear = GEAR_NEUTRAL;
-		} else {
-			gGear = GEAR_FULL;
-		//} else {
-		//	gGear = GEAR_NONE;
-		}
-		Serial.print("gGear: "); Serial.println(gGear);
-    }
+      if(gThrottle < IDLE_MAX)
+      {
+        gGear = GEAR_IDLE;
+      }
+      else
+      {
+        gGear = GEAR_FULL;
+      }
+	}
+		  
+	  uint8_t ThrottleDeadBandMax = RC_NEUTRAL_THROTTLE + RC_DEADBAND;
+	  uint8_t ThrottleDeadBandMin = RC_NEUTRAL_THROTTLE - RC_DEADBAND;
+	  uint8_t SteeringDeadBandMax = RC_NEUTRAL_STEERING + RC_DEADBAND;
+	  uint8_t SteeringDeadBandMin = RC_NEUTRAL_STEERING - RC_DEADBAND;
+	  if(unThrottleIn < ThrottleDeadBandMax && unThrottleIn > ThrottleDeadBandMin &&  
+		unSteeringIn < SteeringDeadBandMax && SteeringDeadBandMax > SteeringDeadBandMin)
+    {
+      analogWrite(pwm_lf, 0);
+      analogWrite(pwm_rr, 0);
+      analogWrite(pwm_lr, 0);
+      analogWrite(pwm_rf, 0);
+     }
+
   if(bUpdateFlags & STEERING_FLAG)
     {
       throttleLeft = gThrottle;
       throttleRight = gThrottle;
 
       gDirection = gThrottleDirection;
-      Serial.print("Direction: "); Serial.println(gDirection);
-	  
+
       // see previous comments regarding trapping out of range errors
       // this is left for the user to decide how to handle and flag
       unSteeringIn = constrain(unSteeringIn, unSteeringMin, unSteeringMax);
@@ -279,47 +280,45 @@ void loop()
         {
           gDirection = DIRECTION_ROTATE_RIGHT;
           // use steering to set throttle
-          throttleRight = throttleLeft = map(unSteeringIn, unSteeringCenter, unSteeringMin, PWM_MIN, PWM_MAX);
-          Serial.print("Rotate Right: "); Serial.println(throttleRight);
-        } else if(unSteeringIn > (unSteeringCenter + RC_DEADBAND))
-          {
-            gDirection = DIRECTION_ROTATE_LEFT;
-            // use steering to set throttle
-            throttleRight = throttleLeft = map(unSteeringIn, unSteeringMax, unSteeringCenter, PWM_MIN, PWM_MAX);
-            Serial.print("Rotate Left: "); Serial.println(throttleRight);
-          }
+          throttleRight = throttleLeft = map(unSteeringIn, unSteeringCenter,unSteeringMin, PWM_MIN, PWM_MAX);
+        }
+        else if(unSteeringIn > (unSteeringCenter + RC_DEADBAND))
+        {
+          gDirection = DIRECTION_ROTATE_LEFT;
+          // use steering to set throttle
+          throttleRight = throttleLeft = map(unSteeringIn, unSteeringMax, unSteeringCenter, PWM_MAX, PWM_MIN);
+        }
         break;
       // if not idle proportionally restrain inside track to turn vehicle around it
       case GEAR_FULL:
         if(unSteeringIn < (unSteeringCenter - RC_DEADBAND))
         {
-          throttleRight = map(unSteeringIn, unSteeringCenter, unSteeringMin, gThrottle, PWM_MIN);
-          Serial.print("Turn Right: "); Serial.print(throttleRight);
-          Serial.print("Turn Right: "); Serial.println(throttleLeft);
-        } else if(unSteeringIn > (unSteeringCenter + RC_DEADBAND)) {
-            throttleLeft = map(unSteeringIn, unSteeringMax, unSteeringCenter, PWM_MIN, gThrottle);
-            Serial.print("Turn Right: "); Serial.print(throttleRight);
-            Serial.print("Turn Right: "); Serial.println(throttleLeft);
-          }
-        break;
-      case GEAR_NEUTRAL:
-        gDirection = DIRECTION_STOP;
+          throttleRight = map(unSteeringIn,unSteeringCenter,unSteeringMin, gThrottle, PWM_MIN);
+        }
+        else if(unSteeringIn > (unSteeringCenter + RC_DEADBAND))
+        {
+          throttleLeft = map(unSteeringIn,unSteeringMax,unSteeringCenter, PWM_MIN, gThrottle);
+        }
         break;
       }
+
+    //analogWrite (pwm_lf, throttleLeft*lf_mtr_adj);
+    //analogWrite (pwm_lr, throttleLeft*lr_mtr_adj);  
+    //analogWrite (pwm_rr, throttleRight*rr_mtr_adj);
+    //analogWrite (pwm_rf, throttleRight*rf_mtr_adj);
+
     }
 
-  Serial.print("Direction: "); Serial.println(gDirection);
-  Serial.print("Old Direction: "); Serial.println(gOldDirection);
-  Serial.print("Old Gear: "); Serial.println(gOldGear);
+
   if((gDirection != gOldDirection) || (gGear != gOldGear))
   {
     gOldDirection = gDirection;
     gOldGear = gGear;
 
-	analogWrite(pwm_lf, 0);
-	analogWrite(pwm_rr, 0);
-	analogWrite(pwm_lr, 0);
-	analogWrite(pwm_rf, 0);
+  analogWrite(pwm_lf, 0);
+  analogWrite(pwm_rr, 0);
+  analogWrite(pwm_lr, 0);
+  analogWrite(pwm_rf, 0);
 
   switch(gDirection)
     {
@@ -402,18 +401,6 @@ void calcSteering(){
 		unSteeringInShared = (uint16_t)(micros() - ulSteeringStart);
 		bUpdateFlagsShared |= STEERING_FLAG;
 	}
-}
-
-bool rangeTest(uint16_t number, uint16_t lower, uint16_t upper) {
-  // use a < for an inclusive lower bound and exclusive upper bound
-  // use <= for an inclusive lower bound and inclusive upper bound
-  // alternatively, if the upper bound is inclusive and you can pre-calculate
-  //  upper-lower, simply add + 1 to upper-lower and use the < operator.
-  if ((unsigned)(number-lower) <= (upper-lower)) {
-    return true;
-    } else {
-      return false;
-    }
 }
 
 

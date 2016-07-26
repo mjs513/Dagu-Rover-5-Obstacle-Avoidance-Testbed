@@ -328,7 +328,6 @@ void turnDelay(){
 			mRight(); 
 			lastMove = "Right";
 		} else {
-			0.0086x2 - 9.9988x + 25.239
 			fit_time = 0.0086*pow(rebound_angle,2) - 9.9988*rebound_angle + 25.239;
 			delay_time = ceil(fit_time);
 			//telem << "Curve Fit (CCW): " << fit_time << endl;      
@@ -346,6 +345,13 @@ void turnDelay(){
 	mStop();
 }
   
+
+
+
+
+
+
+
 
 
 
