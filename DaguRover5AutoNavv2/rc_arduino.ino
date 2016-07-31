@@ -2,6 +2,16 @@
  
 	while( rc_mode_toggle == 1) {
 		//telem.println();
+    //if (Lat.isUpdated() || Long.isUpdated() || SOG.isUpdated() || COG.isUpdated())
+    //{
+    telem.print(F("Lat="));   telem.print(Lat.value()); 
+    telem.print(F(" Long=")); telem.print(Long.value()); 
+    telem.print(F(" SOG="));  telem.print(SOG.value()); 
+    telem.print(F(" COG="));  telem.println(COG.value());
+    //}
+    while (ss.available() > 0) 
+        gps.encode(ss.read()); 
+    
 		// create local variables to hold a local copies of the channel inputs
 		// these are declared static so that thier values will be retained
 		// between calls to loop.
@@ -45,6 +55,10 @@
   
 		}
 
+    //Tests to determine if throttle or steering is in the specified dead zone
+    tDeadZoneRange = rangeTest(unThrottleIn, ThrottleDeadBandMin, ThrottleDeadBandMax);
+    sDeadZoneRange = rangeTest(unSteeringIn, SteeringDeadBandMin, SteeringDeadBandMax);
+
 		// do any processing from here onwards
 		// only use the local values unAuxIn, unThrottleIn and unSteeringIn, the shared
 		// variables unAuxInShared, unThrottleInShared, unSteeringInShared are always owned by
@@ -87,14 +101,9 @@
 		if(gThrottle > IDLE_MAX) {
 			gGear = GEAR_FULL;
 		}
-		//telem.print("Range Test: ");
-		//telem.print(rangeTest(unThrottleIn, ThrottleDeadBandMin, ThrottleDeadBandMax));
-		//telem.print("      ");
-		//telem.println(rangeTest(unSteeringIn, SteeringDeadBandMin, SteeringDeadBandMax));
-		//if(rangeTest(unThrottleIn, ThrottleDeadBandMin, ThrottleDeadBandMax) == 1 &&
-		//	rangeTest(unSteeringIn, SteeringDeadBandMin, SteeringDeadBandMax) == 1) {
-		//		gGear = GEAR_NEUTRAL;
-		//}
+    if(tDeadZoneRange == 1 && sDeadZoneRange == 1){
+  		gGear = GEAR_NEUTRAL;
+		}
 
 		//telem.print("GEAR: "); telem.println(gGear);
 		
@@ -113,7 +122,10 @@
 			// if idle spin on spot
 			switch(gGear)
 			{
-				case GEAR_IDLE:
+        case GEAR_NEUTRAL:
+          gDirection = DIRECTION_STOP;
+          break;
+				case GEAR_IDLE:  
 					// same changes for steering as for throttle
 					if(unSteeringIn < (unSteeringCenter - RC_DEADBAND))
 					{
@@ -134,18 +146,15 @@
 					if(unSteeringIn > (unSteeringCenter + RC_DEADBAND))
 					{
 						throttleRight = map(unSteeringIn, unSteeringCenter, unSteeringMin, gThrottle, PWM_MIN);
-            throttleLeft = 3*throttleLeft;
-						//telem.print("1. Turn Right: "); telem.print(throttleRight);
-						//telem.print(" LEFT: "); telem.println(throttleLeft);
+            throttleLeft = throttleLeft;
+						telem.print("1. Turn Right: "); telem.print(throttleRight);
+						telem.print(" LEFT: "); telem.println(throttleLeft);
 					} else if(unSteeringIn < (unSteeringCenter - RC_DEADBAND)) {
 						throttleLeft = map(unSteeringIn, unSteeringCenter, unSteeringMax, gThrottle, PWM_MIN);
-            throttleRight = 3*throttleRight;
-						//telem.print("2. Turn Left: "); telem.print(throttleRight);
-						//telem.print("  LEFT: "); telem.println(throttleLeft);
+            throttleRight = throttleRight;
+						telem.print("2. Turn Left: "); telem.print(throttleRight);
+						telem.print("  LEFT: "); telem.println(throttleLeft);
 					}
-					break;
-				case GEAR_NEUTRAL:
-					gDirection = DIRECTION_STOP;
 					break;
 			}
 		} 
@@ -162,14 +171,14 @@
 		}
 
     if(unRCInShared < RC_MODE_TOGGLE && rc_sw_on == 1) {
+        mStop();
         telem << "toggle RC Mode off via SW" << endl; 
         rc_sw_on = 0;
-        mStop();
         toggleRC();
       }
       
-		//telem.print("Direction Updated: "); telem.println(gDirection);
-    //telem.println();
+		telem.print("Direction Updated: "); telem.println(gDirection);
+    telem.println();
 		switch(gDirection)
 		{
 		  case DIRECTION_FORWARD:  
@@ -191,9 +200,8 @@
 			  break;
 		}
 
-
 		bUpdateFlags = 0;
-		gDirection = DIRECTION_STOP;
+
 	}
 }
 

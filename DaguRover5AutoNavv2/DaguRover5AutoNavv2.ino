@@ -223,8 +223,8 @@ uint32_t ulRCStart;
 
 uint8_t throttleLeft;
 uint8_t throttleRight;
-int pivotLeft;
-int pivotRight;
+int tDeadZoneRange, sDeadZoneRange;
+
 //
 
 void setup(){
