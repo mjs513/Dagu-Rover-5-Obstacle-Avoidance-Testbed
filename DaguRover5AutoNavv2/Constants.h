@@ -134,7 +134,7 @@ uint16_t SteeringDeadBandMax = RC_NEUTRAL_STEERING + RC_DEADBAND;
 uint16_t SteeringDeadBandMin = RC_NEUTRAL_STEERING - RC_DEADBAND;
 
 #define PWM_MIN 0
-#define PWM_MAX 180
+#define PWM_MAX 200
 
 #define GEAR_NONE 0
 #define GEAR_IDLE 1
@@ -161,7 +161,7 @@ uint8_t gThrottleDirection = DIRECTION_STOP;
 uint8_t gDirection = DIRECTION_STOP;
 uint8_t gOldDirection = DIRECTION_STOP;
 
-#define IDLE_MAX 50
+#define IDLE_MAX 40
 
 #define MODE_RUN 1
 #define MODE_PROGRAM 0

@@ -145,17 +145,17 @@
 				case GEAR_FULL:
 					if(unSteeringIn > (unSteeringCenter + RC_DEADBAND))
 					{
-						throttleRight = map(unSteeringIn, unSteeringCenter, unSteeringMin, gThrottle, PWM_MIN);
+						throttleRight = map(unSteeringIn,unSteeringCenter,unSteeringMax,gThrottle,PWM_MIN);
             throttleLeft = throttleLeft;
 						telem.print("1. Turn Right: "); telem.print(throttleRight);
 						telem.print(" LEFT: "); telem.println(throttleLeft);
 					} else if(unSteeringIn < (unSteeringCenter - RC_DEADBAND)) {
-						throttleLeft = map(unSteeringIn, unSteeringCenter, unSteeringMax, gThrottle, PWM_MIN);
+						throttleLeft = map(unSteeringIn,unSteeringMin,unSteeringCenter,PWM_MIN,gThrottle);
             throttleRight = throttleRight;
 						telem.print("2. Turn Left: "); telem.print(throttleRight);
 						telem.print("  LEFT: "); telem.println(throttleLeft);
 					}
-					break;
+					break;        
 			}
 		} 
 
