@@ -72,6 +72,9 @@
 //    Megamouse An Autonomous Maze Solving Robot
 //       https://djgeorgevas.com/static/megamouse.pdf
 //
+//==================== DAGU ROVER 5 =========================================================
+//
+//
 //============================================================================================
 // rcarduino.blogspot.com
 //
@@ -150,6 +153,7 @@ elapsedMillis motorFwdRunTime;
 elapsedMillis motorTurnTime;
 elapsedMillis motorRevTime;
 elapsedMillis turn_timer;
+elapsedMillis telem_timer;
 
 // the interval in mS 
 unsigned long currentTime;
@@ -335,9 +339,7 @@ void loop(){
         motorFwd = 0;
         
         telem.println("Rolling Forward!");
-        // zeros out encoder counts and reads encoders zero value
-        encA.write(0); encB.write(0); encC.write(0); encD.write(0);
-        getTicks_noreset();
+        send_telemetry();
         mForward();
         
        while(motorFwdRunTime < defaultFwdTime){

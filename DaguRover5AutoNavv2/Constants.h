@@ -97,6 +97,7 @@ const int head_rdiag = 135;
 #define defaultTurnTime 1000
 #define defaultFwdTime 7000
 #define defaultRevTime 700
+#define defaultTelemTime 100
 
 //Bubble Rebound Parameters
 const float V = 21;

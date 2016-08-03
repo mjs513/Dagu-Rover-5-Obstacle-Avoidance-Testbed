@@ -99,9 +99,8 @@ void getTicks_noreset(){
   ticksRR = encC.read();
   ticksLR = encD.read();
   
-  telem.println(ticksLF);  telem.println(ticksRF);
-  telem.println(ticksLR);  telem.println(ticksRR);
-  telem.println();
+  telem << ticksLF << "," << ticksLR << ",";
+  telem << ticksRF << "," << ticksRR << endl;
 }
 
 void getCurrent() {

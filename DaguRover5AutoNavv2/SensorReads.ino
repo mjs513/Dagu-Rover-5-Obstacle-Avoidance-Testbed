@@ -96,7 +96,7 @@ void compass_update() {
     pitch = (float)event.orientation.z;
     yar_heading = (float)event.orientation.x;
 
-    telem << roll << "\t" << pitch << "\t" << yar_heading << endl;
+    //telem << roll << "\t" << pitch << "\t" << yar_heading << endl;
     //telem << "Changed heading: " << yar_heading << endl;
    
   }  
@@ -164,7 +164,31 @@ int rearIRaverage(int average_count) {
 	return(sum/average_count);  
 }
 
+void send_telemetry(){
+    //===  Telemetry section =========
+    if(telem_timer > defaultTelemTime) {
+      telem << Lat.value() << "," << Long.value();
+      telem << "," << SOG.value() << "," << SOG.value() << ",";
 
+      while (ss.available() > 0) 
+          gps.encode(ss.read()); 
+
+      // IMU
+      compass_update();
+      telem << -roll << "," << -pitch << "," << yar_heading;
+
+      //Direction
+      telem << "," << gDirection << ",";
+
+      //Wheel Encoders
+      // zeros out encoder counts and reads encoders zero value
+      //encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+      getTicks_noreset();
+
+      telem_timer = 0;
+      encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+    }
+}
 
 
 

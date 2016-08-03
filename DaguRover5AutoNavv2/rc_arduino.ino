@@ -2,16 +2,6 @@
  
 	while( rc_mode_toggle == 1) {
 		//telem.println();
-    //if (Lat.isUpdated() || Long.isUpdated() || SOG.isUpdated() || COG.isUpdated())
-    //{
-    telem.print(F("Lat="));   telem.print(Lat.value()); 
-    telem.print(F(" Long=")); telem.print(Long.value()); 
-    telem.print(F(" SOG="));  telem.print(SOG.value()); 
-    telem.print(F(" COG="));  telem.println(COG.value());
-    //}
-    while (ss.available() > 0) 
-        gps.encode(ss.read()); 
-    
 		// create local variables to hold a local copies of the channel inputs
 		// these are declared static so that thier values will be retained
 		// between calls to loop.
@@ -147,13 +137,21 @@
 					{
 						throttleRight = map(unSteeringIn,unSteeringCenter,unSteeringMax,gThrottle,PWM_MIN);
             throttleLeft = throttleLeft;
-						telem.print("1. Turn Right: "); telem.print(throttleRight);
-						telem.print(" LEFT: "); telem.println(throttleLeft);
+            if(gThrottle < 100) {
+              throttleRight = 1.2* throttleRight;
+              throttleLeft = 1.2 * throttleLeft;
+            }
+						//telem.print("1. Turn Right: "); telem.print(throttleRight);
+						//telem.print(" LEFT: "); telem.println(throttleLeft);
 					} else if(unSteeringIn < (unSteeringCenter - RC_DEADBAND)) {
 						throttleLeft = map(unSteeringIn,unSteeringMin,unSteeringCenter,PWM_MIN,gThrottle);
             throttleRight = throttleRight;
-						telem.print("2. Turn Left: "); telem.print(throttleRight);
-						telem.print("  LEFT: "); telem.println(throttleLeft);
+            if(gThrottle < 100) {
+              throttleRight = 1.2* throttleRight;
+              throttleLeft = 1.2 * throttleLeft;
+            }
+						//telem.print("2. Turn Left: "); telem.print(throttleRight);
+						//telem.print("  LEFT: "); telem.println(throttleLeft);
 					}
 					break;        
 			}
@@ -170,6 +168,9 @@
 			}
 		}
 
+    //Send telemetry data to radio
+    send_telemetry();
+
     if(unRCInShared < RC_MODE_TOGGLE && rc_sw_on == 1) {
         mStop();
         telem << "toggle RC Mode off via SW" << endl; 
@@ -177,8 +178,8 @@
         toggleRC();
       }
       
-		telem.print("Direction Updated: "); telem.println(gDirection);
-    telem.println();
+		//telem.print("Direction Updated: "); telem.println(gDirection);
+    //telem.println();
 		switch(gDirection)
 		{
 		  case DIRECTION_FORWARD:  
