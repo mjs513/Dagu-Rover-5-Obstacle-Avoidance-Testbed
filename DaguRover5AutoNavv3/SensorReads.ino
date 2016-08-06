@@ -165,6 +165,12 @@ int rearIRaverage(int average_count) {
 void send_telemetry(){
     //===  Telemetry section =========
     if(telem_timer > defaultTelemTime) {
+      DateTime time = rtc.now();
+      telem << time.timestamp(DateTime::TIMESTAMP_TIME);
+      telem << ",";
+
+      telem << etm_millis.elapsed()/1000. << ",";
+      
       telem << Lat.value() << "," << Long.value();
       telem << "," << SOG.value() << "," << SOG.value() << ",";
 

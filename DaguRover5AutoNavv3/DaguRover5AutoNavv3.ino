@@ -109,7 +109,6 @@
 #include <StandardCplusplus.h>
 #include <vector>
 
-
 #include <NewPing.h>
 #include <Servo.h>         //servo library
 #include <Encoder.h>
@@ -119,6 +118,9 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
+
+#include <RTClib.h>
+#include <StopWatch.h>
 
 #include <Streaming.h>
 #include <elapsedMillis.h>
@@ -140,6 +142,9 @@ TinyGPSCustom EW(gps, "GNRMC", 6);
 TinyGPSCustom Lat(gps, "GNRMC", 3);
 TinyGPSCustom SOG(gps, "GNRMC", 7);
 TinyGPSCustom COG(gps, "GNRMC",8);
+
+RTC_DS3231 rtc; 
+StopWatch etm_millis;
 
 //Globals
 float roll, pitch;
@@ -237,7 +242,8 @@ void setup(){
 
 	Wire.begin();
 	ss.begin(GPSBaud);  //GPS Device Baud Rate
-    
+  rtc.begin();
+
 	//==================================================
 	// Change I2C bus speed from 100KHz to 400KHz
 	//==================================================
@@ -457,8 +463,11 @@ void toggleRoam(){
   // This method chooses to make the robot roam or else use the telem command input.
   if(roam == 0){
    roam = 1;
+   etm_millis.start();
    telem.println("Activated Roam Mode");
   } else {
+    etm_millis.stop();
+    etm_millis.reset();
     roam = 0;
     mStop();
     telem.println("De-activated Roam Mode");
@@ -472,10 +481,13 @@ void toggleRC(){
   if(rc_mode_toggle == 0){
    rc_mode_toggle = 1;
    telem.println("Activated RC Mode");
+   etm_millis.start();
   } else {
     rc_mode_toggle = 0;
     throttleLeft = throttleRight = speed;
     mStop();
+    etm_millis.stop();
+    etm_millis.reset();
     telem.println("De-activated RC Mode");
 	  telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c]"); // Tell us I"m ready
   }
