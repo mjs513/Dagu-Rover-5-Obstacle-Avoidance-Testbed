@@ -15,76 +15,35 @@
   License along with this library; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
-void pointTo(int angle){
-  int target = angle;
-  target = target % 360;
-  
-  if(target < 0){
-    target += 360;
-  }
-  
-  int direction = angle;
+void pivotTo(int target){
   
   while(1){
     compass_update();
-    int currentAngle = yar_heading;
+    int currentAngle = wp_heading;
     int diff = target - currentAngle;
-    direction = 180 - (diff + 360) % 360;
-	
-    if(direction > 0){
+
+    telem << "Compass Control: " << endl;
+    telem << "\t" << currentAngle << ", " << target << ", " << diff << endl;
+    
+    if(diff > 0) {
+	    throttleRight = FAST_SPEED;
+	    throttleLeft = SLOW_SPEED;
       mRight();//right
       delay(10);
     } else {
+	    throttleRight = SLOW_SPEED;
+	    throttleLeft = FAST_SPEED;
       mLeft();//left
       delay(10);
     }
-    //if(diff<-180) 
-    //  diff += 360;
-    //else if(diff> 180) 
-    //  diff -= 360;
-    //direction=-diff;
     
-    if(abs(diff) < 5){
+    if(abs(diff) < HEADING_TOLERANCE){
       mStop();
       return;
     }
   }
 }
 
-void turn(int angle){
-  compass_update();
-  int originalAngle = yar_heading;
-  int target = originalAngle + angle;
-  pointTo(target);
-  
-  /*uint8_t speed=80;
-  target=target%360;
-  if(target<0){
-    target+=360;
-  }
-  int direction=angle;
-  while(1){
-    if(direction>0){
-      motorsWrite(speed,speed);//right
-      delay(10);
-    }else{
-      motorsWrite(-speed,-speed);//left
-      delay(10);
-    }
-    int currentAngle=compassRead();
-    int diff=target-currentAngle;
-    if(diff<-180) 
-      diff += 360;
-    else if(diff> 180) 
-      diff -= 360;
-    direction=-diff;
-    
-    if(abs(diff)<5){
-      motorsWrite(0,0);
-      return;
-    }
-  }*/
-}
 
 
 

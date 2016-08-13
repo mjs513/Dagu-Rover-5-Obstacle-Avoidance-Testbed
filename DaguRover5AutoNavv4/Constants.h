@@ -176,18 +176,25 @@ uint32_t ulProgramModeExitTime = 0;
 // Waypoints  Constants
 #define HEADING_TOLERANCE 5     // tolerance +/- (in degrees) within which we don't attempt to turn to intercept targetHeading
 
-#define WAYPOINT_DIST_TOLERANE  3   // tolerance in meters to waypoint; once within this tolerance, will advance to the next waypoint
-#define NUMBER_WAYPOINTS 1          // enter the numebr of way points here (will run from 0 to (n-1))
+#define WAYPOINT_DIST_TOLERANCE  5   // tolerance in meters to waypoint; once within this tolerance, will advance to the next waypoint
+#define NUMBER_WAYPOINTS 2          // enter the numebr of way points here (will run from 0 to (n-1))
 int waypointNumber = -1;            // current waypoint number; will run from 0 to (NUMBER_WAYPOINTS -1); start at -1 and gets initialized during setup()
-waypointClass waypointList[NUMBER_WAYPOINTS] = {waypointClass(40.774611, -73.814649)}
+
+struct waypoints {
+    float tLat;
+    float tLong;
+};
+
+waypoints waypointList[NUMBER_WAYPOINTS] = { { 40.774664, -73.814618},
+                                            {0,0}};
+//waypointClass waypointList[NUMBER_WAYPOINTS] = {waypointClass(40.774611, -73.814649),waypointClass()}
 
 //waypointClass waypointList[NUMBER_WAYPOINTS] = 
 //		{waypointClass(40.774611, -73.814649), waypointClass(40.774615, -73.814671), waypointClass(40.774672, -73.814659), 
 //		waypointClass(40.774664, -73.814618), waypointClass(40.774631, -73.814622), waypointClass(40.774634, -73.814649) };
 
 // Steering/turning 
-enum directions {left = TURN_LEFT, right = TURN_RIGHT, straight = TURN_STRAIGHT} ;
-directions turnDirection = straight;
+int turnDirections;
 
 
 // Object avoidance distances (in cm)

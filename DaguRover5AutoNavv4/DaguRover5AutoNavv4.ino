@@ -238,7 +238,7 @@ float currentLat,
       currentLong,
       targetLat,
       targetLong,
-      heading,
+      wp_heading,
       distanceToTarget,            // current distance to target (current waypoint)
 	  originalDistanceToTarget;    // distance to original waypoing when we started navigating to it
 
@@ -284,7 +284,7 @@ void setup(){
 	delay(100);
  
 	telem.println();
-	telem.println("Ready to receive telem Commands![g, f, b, r, l, s, t, c]"); // Tell us I"m ready
+	telem.println("Ready to receive telem Commands![g, f, b, r, l, s, t, c, w]"); // Tell us I"m ready
 
   //telem.println("My Commands are: ");
   //telem.println("f:forward");
@@ -441,9 +441,14 @@ void loop(){
       telem.println("toggle RC control mode");
       toggleRC();
       break;
+
+    case 'w' :
+      telem << "Waypoint Navigation Started" << endl;
+      waypointNumber = -1;
+      WaypointNav();
     }      
     delay(1);  
-    telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c]"); // Tell us I"m ready
+    telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c, w]"); // Tell us I"m ready
   }
       
   if(roam == 0){ 

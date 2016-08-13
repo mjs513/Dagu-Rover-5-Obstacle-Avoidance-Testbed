@@ -95,17 +95,19 @@ void compass_update() {
     yar_heading = (float)event.orientation.x;
 
 	// Adjust heading to account for declination
-    heading = yar_heading;
-    heading += DEC_ANGLE;
-  
+    wp_heading = yar_heading;
+    wp_heading += DEC_ANGLE;
+    
+    //telem << "Compass Yar/dec Heading: " << yar_heading << " , " << heading << endl;
+    
     // Correct for when signs are reversed.
-    if(heading < 0)
-      heading += 360.;
+    if(wp_heading < 0)
+      wp_heading += 360.;
     
     // Check for wrap due to addition of declination.
-    if(heading > 360.)
-      heading -= 360.;
-
+    if(wp_heading > 360.)
+      wp_heading -= 360.;
+    
     //telem << roll << "\t" << pitch << "\t" << yar_heading << endl;
     //telem << "Changed heading: " << yar_heading << endl;
    
@@ -185,7 +187,8 @@ void send_telemetry(){
       currentLat = gps.location.lat();
       currentLong = gps.location.lng();
       
-      telem << currentLat << "," << currentLong;
+      telem << _FLOAT(currentLat,6);
+      telem << "," << _FLOAT(currentLong,6) << "," << gps.location.isValid();
       telem << "," << gps.speed.mps() << "," << gps.course.deg() << ",";
 
       while (ss.available() > 0) 
@@ -194,7 +197,7 @@ void send_telemetry(){
       // IMU
       compass_update();
       telem << -roll << "," << -pitch << "," << yar_heading << ",";
-      telem << heading << ",";
+      telem << wp_heading << ",";
 
       //Direction
       telem << "," << gDirection << ",";
