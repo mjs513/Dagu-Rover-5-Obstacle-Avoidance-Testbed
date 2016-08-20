@@ -1,4 +1,4 @@
-//============================================================================
+ //============================================================================
 //    Sketch to test various technicques in robotic car design such as
 //    obstacle detection and avoidance, compass as turn guide,
 //    motor control, etc.
@@ -228,13 +228,16 @@ uint8_t throttleRight;
 int tDeadZoneRange, sDeadZoneRange;
 
 //****************  Waypoint Navigation  ******************
+
+int wp_mode_toggle = 0;
+
 // Compass navigation
-float targetHeading,              // where we want to go to reach current waypoint
+double targetHeading,              // where we want to go to reach current waypoint
 	  currentHeading,             // where we are actually facing now
 	  headingError;               // signed (+/-) difference between targetHeading and currentHeading
 
 // GPS Navigation
-float currentLat,
+double currentLat,
       currentLong,
       targetLat,
       targetLong,
@@ -293,6 +296,7 @@ void setup(){
   //telem.println("l:left");
   //telem.println("s:stop");
   //telem.println("g:ground type, g1 = hard, g2 = carpet");
+  //telem.println("w: Waypoint navigation")
   //telem.println("t:toggleRoam");
 
   //signal output port
@@ -443,9 +447,8 @@ void loop(){
       break;
 
     case 'w' :
-      telem << "Waypoint Navigation Started" << endl;
-      waypointNumber = -1;
-      WaypointNav();
+      telem << "Waypoint Navigation Activated" << endl;
+	    toggleWP();
     }      
     delay(1);  
     telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c, w]"); // Tell us I"m ready
@@ -469,8 +472,17 @@ void loop(){
         telem << "toggle RC Mode On via SW" << endl; 
         rc_sw_on = 1;
         toggleRC();
-      }
+     }
+
+  if(wp_mode_toggle == 0){ 
+      //just listen for telem commands and wait
+     }
+  else if(wp_mode_toggle == 1) {  //If roam active- drive autonomously
+    toggleWP();
+    }	  
+	  
 }
+
 
 void toggleRoam(){
   // This method chooses to make the robot roam or else use the telem command input.
@@ -484,10 +496,11 @@ void toggleRoam(){
     roam = 0;
     mStop();
     telem.println("De-activated Roam Mode");
-    telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c]"); // Tell us I"m ready
+    telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c, w]"); // Tell us I"m ready
 
   }
 }
+
 
 void toggleRC(){
   // This method chooses to make the robot roam or else use the telem command input.
@@ -502,8 +515,23 @@ void toggleRC(){
     etm_millis.stop();
     etm_millis.reset();
     telem.println("De-activated RC Mode");
-	  telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c]"); // Tell us I"m ready
+	  telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c, w]"); // Tell us I"m ready
   }
+}
+
+void toggleWP(){
+	if(wp_mode_toggle == 0) {
+    wp_mode_toggle = 1;
+    telem << "Waypoint Nav Activated" << endl;
+    goWayPoint();
+	} else {
+		wp_mode_toggle = 0;
+		waypointNumber = -1;
+		mStop();
+		telem << "Waypoint Nav De-activated" << endl;
+		telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c, w]"); // Tell us I"m ready
+	  }
+		
 }
 
 void goRoam() {  
@@ -514,8 +542,12 @@ void goRoam() {
 }
 
 void goRC() {  
-   rc_control();   
- 
+	rc_control();   
+}
+
+void goWayPoint(){
+	 WaypointNav();
+   executeWaypointNav();
 }
 
 //**********************************************************

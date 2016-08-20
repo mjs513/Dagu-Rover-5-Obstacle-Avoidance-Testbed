@@ -21,7 +21,7 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //============================================================================
 
-#define telem Serial
+#define telem Serial3
 //#define telem Serial3 // bluetooth
 
 // The serial connection to the GPS device
@@ -176,17 +176,23 @@ uint32_t ulProgramModeExitTime = 0;
 // Waypoints  Constants
 #define HEADING_TOLERANCE 5     // tolerance +/- (in degrees) within which we don't attempt to turn to intercept targetHeading
 
-#define WAYPOINT_DIST_TOLERANCE  5   // tolerance in meters to waypoint; once within this tolerance, will advance to the next waypoint
-#define NUMBER_WAYPOINTS 2          // enter the numebr of way points here (will run from 0 to (n-1))
+#define WAYPOINT_DIST_TOLERANCE  3   // tolerance in meters to waypoint; once within this tolerance, will advance to the next waypoint
+#define NUMBER_WAYPOINTS 6          // enter the numebr of way points here (will run from 0 to (n-1))
 int waypointNumber = -1;            // current waypoint number; will run from 0 to (NUMBER_WAYPOINTS -1); start at -1 and gets initialized during setup()
 
 struct waypoints {
-    float tLat;
-    float tLong;
+    double tLat;
+    double tLong;
 };
 
-waypoints waypointList[NUMBER_WAYPOINTS] = { { 40.774664, -73.814618},
-                                            {0,0}};
+waypoints waypointList[NUMBER_WAYPOINTS] = {
+                                            {40.774674, -73.814664},
+                                            {40.774664, -73.814612},
+                                            {40.774630, -73.814614},
+                                            {40.774631, -73.814622},
+                                            {40.774614, -73.814669},
+                                            {0,0}
+                                            };
 //waypointClass waypointList[NUMBER_WAYPOINTS] = {waypointClass(40.774611, -73.814649),waypointClass()}
 
 //waypointClass waypointList[NUMBER_WAYPOINTS] = 
