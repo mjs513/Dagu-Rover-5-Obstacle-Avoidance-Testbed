@@ -280,7 +280,7 @@ void setup(){
 	#endif
     
 	//==================================================
-	// Initial AltIMU10 v3
+	// Initial Adafruit BNO055
 	//==================================================
     
 	BNO055_Init();
@@ -295,21 +295,25 @@ void setup(){
   //telem.println("r:right");
   //telem.println("l:left");
   //telem.println("s:stop");
-  //telem.println("g:ground type, g1 = hard, g2 = carpet");
+  //telem.println("g:ground type, g1 = hard, g2 = carpet" g3 = grass);
+  //telem.println("p: acquire GPS fix")
   //telem.println("w: Waypoint navigation")
   //telem.println("t:toggleRoam");
 
   //signal output port
   //set all of the outputs for the motor driver
-  pinMode(pwm_lf, OUTPUT);
+	pinMode(pwm_lf, OUTPUT);
 	pinMode(dir_lf, OUTPUT);
 	pinMode(CURRENTLF, INPUT);
+	
 	pinMode(pwm_rr, OUTPUT);
 	pinMode(dir_rr, OUTPUT); 
 	pinMode(CURRENTRR, INPUT);
+	
 	pinMode(pwm_lr, OUTPUT);
 	pinMode(dir_lr, OUTPUT); 
 	pinMode(CURRENTLR, INPUT);
+	
 	pinMode(pwm_rf, OUTPUT);
 	pinMode(dir_rf, OUTPUT); 
 	pinMode(CURRENTRF, INPUT);
@@ -324,9 +328,9 @@ void setup(){
 
 	PCintPort::attachInterrupt(THROTTLE_IN_PIN, calcThrottle, CHANGE);
 	PCintPort::attachInterrupt(STEERING_IN_PIN, calcSteering, CHANGE);
-  PCintPort::attachInterrupt(RCMODE_IN_PIN, togRCMode, CHANGE);
+	PCintPort::attachInterrupt(RCMODE_IN_PIN, togRCMode, CHANGE);
   
-  throttleLeft = throttleRight = speed;
+	throttleLeft = throttleRight = speed;
 
 }
 
@@ -340,6 +344,11 @@ void loop(){
 
     switch(val)
     {
+	  case 'p':
+	    //Acquire GPS fix
+	      gps_ready();
+        break;
+	   
       case 'g':
        if(turn_time_mult == 2) {
         obsDist = 47; //was 47
@@ -349,7 +358,61 @@ void loop(){
         lcIRthreshold = 25;  //was 45, last 47; was 27
         sideSensorThreshold = 27; //was 42; was 27
         gnd_type = 2;  // carpet
-       }
+		
+		// Speeds (range: 0 - 255)
+		FAST_SPEED = 150;
+		TURN_SPEED_DIFF = 100;
+       } else if(turn_time_mult == 1) {
+			gnd_type = 1;  // hardwood
+			obsDist = 47; //was 47
+			sidedistancelimit = 37;  // was 27
+			fowardheadThreshold = 37; //was 49, 39, 29; was 27
+			lcThreshold = 36;         // was 47,27; was 26
+			lcIRthreshold = 35;  //was 45, last 47; was 27
+			sideSensorThreshold = 37; //was 42; was 27
+			max_IR_distance = 200;
+
+			backupSensorThreshold = 17;		//17.78 - not implemented yet
+			backup_high = 500;
+			backup_low = 100;
+
+			//Set Motor Speed
+			speed = 50;
+			turnSpeed = 150;
+			lf_mtr_adj = 1.5;
+			rr_mtr_adj = 0.97;
+			lr_mtr_adj = 1.15;
+			rf_mtr_adj = 1.0;
+			
+			// Speeds (range: 0 - 255)
+			FAST_SPEED = 150;
+			TURN_SPEED_DIFF = 100;
+		} else if(turn_time_mult == 3) {
+				gnd_type = 3;  // grass
+				obsDist = 47; //was 47
+				sidedistancelimit = 37;  // was 27
+				fowardheadThreshold = 37; //was 49, 39, 29; was 27
+				lcThreshold = 36;         // was 47,27; was 26
+				lcIRthreshold = 35;  //was 45, last 47; was 27
+				sideSensorThreshold = 37; //was 42; was 27
+				max_IR_distance = 200;
+
+				backupSensorThreshold = 17;		//17.78 - not implemented yet
+				backup_high = 500;
+				backup_low = 100;
+
+				//Set Motor Speed
+				speed = 150;
+				turnSpeed = 180;
+				lf_mtr_adj = 1.5;
+				rr_mtr_adj = 0.97;
+				lr_mtr_adj = 1.15;
+				rf_mtr_adj = 1.0;
+			
+				// Speeds (range: 0 - 255)
+				FAST_SPEED = 250;
+				TURN_SPEED_DIFF = 125;
+			}
        break;
 		
       case 'f' : 
@@ -448,8 +511,10 @@ void loop(){
 
     case 'w' :
       telem << "Waypoint Navigation Activated" << endl;
-	    toggleWP();
-    }      
+      toggleWP();
+      break;
+    }     
+	
     delay(1);  
     telem.println("I'm Ready to receive telem Commands![g, f, b, r, l, s, t, c, w]"); // Tell us I"m ready
   }

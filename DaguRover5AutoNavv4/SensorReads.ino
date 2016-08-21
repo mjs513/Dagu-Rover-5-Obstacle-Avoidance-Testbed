@@ -212,9 +212,40 @@ void send_telemetry(){
     }
 }
 
+void gps_ready() {
+	while(1){
+	  if(gps.satellites.value() < 5 || gps.satellites.isValid() == 0 || gps.hdop.value() > 110 ||
+		  gps.hdop.isValid() == 0 || gps.location.isValid() == 0) {
+        telem << "Acquiring GPS Fix => " << gps.satellites.value() << ",  " << gps.satellites.isValid();
+        telem <<  ",  " << gps.hdop.value() <<  ",  " << gps.hdop.isValid() <<  ",  ";
+        telem << gps.location.isValid() << endl;
+        smartDelay(1000);
+        
+        if(telem.available() > 0 ) {
+          int val = telem.read();  //read telem input commands  
+          if(val == 'p') {
+            telem.println("Returning to main"); 
+            return;
+          }
+        }
+		  } else {
+        return;
+		  }
+	}
+}
 
 
-
+// This custom version of delay() ensures that the gps object
+// is being "fed".
+static void smartDelay(unsigned long ms)
+{
+  unsigned long start = millis();
+  do 
+  {
+    while (ss.available())
+      gps.encode(ss.read());
+  } while (millis() - start < ms);
+}
 
 
 

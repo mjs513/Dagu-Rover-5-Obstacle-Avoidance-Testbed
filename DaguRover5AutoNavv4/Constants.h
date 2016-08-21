@@ -48,17 +48,17 @@ int sideSensorThreshold = 37; //was 42; was 27
 int max_IR_distance = 200;
 int turnCounter = 0;
 
-const int backupSensorThreshold = 17;		//17.78 - not implemented yet
-const int backup_high = 500;
-const int backup_low = 100;
+int backupSensorThreshold = 17;		//17.78 - not implemented yet
+int backup_high = 500;
+int backup_low = 100;
 
 //Set Motor Speed
-const int speed = 50;
-const int turnSpeed = 150;
-const float lf_mtr_adj = 1.5;
-const float rr_mtr_adj = 0.97;
-const float lr_mtr_adj = 1.15;
-const float rf_mtr_adj = 1.0;
+int speed = 50;
+int turnSpeed = 150;
+float lf_mtr_adj = 1.5;
+float rr_mtr_adj = 0.97;
+float lr_mtr_adj = 1.15;
+float rf_mtr_adj = 1.0;
 int turn_time_mult = 2;
 int turn_time;
 
@@ -210,10 +210,10 @@ int turnDirections;
 
 
 // Speeds (range: 0 - 255)
-#define FAST_SPEED 150
+int FAST_SPEED = 150;
 #define NORMAL_SPEED 125
 #define TURN_SPEED 125
-#define TURN_SPEED_DIFF 100
+int TURN_SPEED_DIFF = 100;
 #define SLOW_SPEED 75
 #define NORMAL_SPEED speed
 

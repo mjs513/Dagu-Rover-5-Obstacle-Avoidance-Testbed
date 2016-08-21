@@ -81,6 +81,7 @@ void processGPS(void)
         
   targetHeading = (float) targetHeading1;
   distanceToTarget = distanceToTarget1;
+  
   telem << "process GPS: Target Heading/Distance: " << gps.location.isValid() << ",  " << targetHeading1 << " , " << distanceToTarget1 << endl;
   
   if(telem.available() > 0) {
@@ -98,8 +99,9 @@ void calcDesiredTurn(void)
     compass_update();
     // calculate where we need to turn to head to destination
     headingError = targetHeading - wp_heading;
+	
     telem << "CalcDesired: Target/Current Heading: " << targetHeading << " , " << wp_heading << endl;
-    telem << "Heading Error = " << headingError << endl;
+    telem << "Heading Error = " << headingError << endl << endl;
 	
     // adjust for compass wrap
     //if (headingError < -180)      
@@ -133,7 +135,7 @@ void moveAndAvoid(void)
 						throttleRight =  TURN_SPEED;
 						throttleLeft = TURN_SPEED_DIFF;
 					}
-			telem << "Direction: " << turnDirections << endl;
+			//telem << "Direction: " << turnDirections << endl;
 			mForward();
 			processGPS();
 			calcDesiredTurn();
