@@ -38,6 +38,8 @@ void executeWaypointNav(void){
 
 void nextWaypoint(void)
 {
+
+  telem << "Reached waypoint number " << waypointNumber << " Going to next point" << endl;
   waypointNumber++;
   targetLat = waypointList[waypointNumber].tLat;
   targetLong = waypointList[waypointNumber].tLong;
@@ -136,14 +138,18 @@ void moveAndAvoid(void)
 						throttleLeft = TURN_SPEED_DIFF;
 					}
 			//telem << "Direction: " << turnDirections << endl;
-			mForward();
-			processGPS();
-			calcDesiredTurn();
-			send_telemetry();
+      if(gps_waypoint_timer > defaultWayPointTime) {
+			  mForward();
+			  processGPS();
+			  calcDesiredTurn();
+      }
+      send_telemetry();
 		}
-    mForward();
-    processGPS();
-    calcDesiredTurn();
+    if(gps_waypoint_timer > defaultWayPointTime) {
+       mForward();
+       processGPS();
+       calcDesiredTurn();
+    }
     send_telemetry();
 	}
 	

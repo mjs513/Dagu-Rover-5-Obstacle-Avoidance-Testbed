@@ -21,7 +21,7 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //============================================================================
 
-#define telem Serial3
+#define telem Serial
 //#define telem Serial3 // bluetooth
 
 // The serial connection to the GPS device
@@ -31,7 +31,7 @@
 const boolean fastmode = true;
 
 //GPS Baud Rate
-#define GPSBaud 57600
+#define GPSBaud 115200
 
 //int fowardheadThreshold = 52;  	//30.48,41,51,52      headservo - obs[3]
 //int lcThreshold = 50; 	        //40.64,38,45,50      sonarlc obs[1]
@@ -99,6 +99,7 @@ const int head_rdiag = 135;
 #define defaultFwdTime 7000
 #define defaultRevTime 700
 #define defaultTelemTime 100
+#define defaultWayPointTime 100
 
 //Bubble Rebound Parameters
 const float V = 21;
@@ -176,7 +177,7 @@ uint32_t ulProgramModeExitTime = 0;
 // Waypoints  Constants
 #define HEADING_TOLERANCE 5     // tolerance +/- (in degrees) within which we don't attempt to turn to intercept targetHeading
 
-#define WAYPOINT_DIST_TOLERANCE  3   // tolerance in meters to waypoint; once within this tolerance, will advance to the next waypoint
+#define WAYPOINT_DIST_TOLERANCE  4   // tolerance in meters to waypoint; once within this tolerance, will advance to the next waypoint
 #define NUMBER_WAYPOINTS 6          // enter the numebr of way points here (will run from 0 to (n-1))
 int waypointNumber = -1;            // current waypoint number; will run from 0 to (NUMBER_WAYPOINTS -1); start at -1 and gets initialized during setup()
 
@@ -193,11 +194,6 @@ waypoints waypointList[NUMBER_WAYPOINTS] = {
                                             {40.774614, -73.814669},
                                             {0,0}
                                             };
-//waypointClass waypointList[NUMBER_WAYPOINTS] = {waypointClass(40.774611, -73.814649),waypointClass()}
-
-//waypointClass waypointList[NUMBER_WAYPOINTS] = 
-//		{waypointClass(40.774611, -73.814649), waypointClass(40.774615, -73.814671), waypointClass(40.774672, -73.814659), 
-//		waypointClass(40.774664, -73.814618), waypointClass(40.774631, -73.814622), waypointClass(40.774634, -73.814649) };
 
 // Steering/turning 
 int turnDirections;

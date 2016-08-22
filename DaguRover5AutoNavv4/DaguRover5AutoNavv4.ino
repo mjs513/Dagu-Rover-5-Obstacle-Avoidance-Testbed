@@ -152,6 +152,7 @@ elapsedMillis motorTurnTime;
 elapsedMillis motorRevTime;
 elapsedMillis turn_timer;
 elapsedMillis telem_timer;
+elapsedMillis gps_waypoint_timer;
 
 // the interval in mS 
 unsigned long currentTime;
@@ -388,7 +389,7 @@ void loop(){
 			FAST_SPEED = 150;
 			TURN_SPEED_DIFF = 100;
 		} else if(turn_time_mult == 3) {
-				gnd_type = 3;  // grass
+				gnd_type = 3;  // grass for waypoint
 				obsDist = 47; //was 47
 				sidedistancelimit = 37;  // was 27
 				fowardheadThreshold = 37; //was 49, 39, 29; was 27
@@ -402,7 +403,7 @@ void loop(){
 				backup_low = 100;
 
 				//Set Motor Speed
-				speed = 150;
+				speed = 100;  //was 150
 				turnSpeed = 180;
 				lf_mtr_adj = 1.5;
 				rr_mtr_adj = 0.97;
@@ -410,8 +411,8 @@ void loop(){
 				rf_mtr_adj = 1.0;
 			
 				// Speeds (range: 0 - 255)
-				FAST_SPEED = 250;
-				TURN_SPEED_DIFF = 125;
+				FAST_SPEED = 180; // was 250
+				TURN_SPEED_DIFF = 90;  // was 125
 			}
        break;
 		
