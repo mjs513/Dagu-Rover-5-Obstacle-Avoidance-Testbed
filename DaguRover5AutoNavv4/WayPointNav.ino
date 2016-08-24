@@ -2,7 +2,7 @@ void WaypointNav() {
   //
   // Wait for GPS to get signal
   #ifndef NO_GPS_WAIT
-  while (!gps.location.isValid())                      // wait for fix, updating display with each new NMEA sentence received
+  while (!gps.location.isValid())  // wait for fix, updating display with each new NMEA sentence received
     {
       send_telemetry();
       // loop until fix established
@@ -84,7 +84,7 @@ void processGPS(void)
   targetHeading = (float) targetHeading1;
   distanceToTarget = distanceToTarget1;
   
-  telem << "process GPS: Target Heading/Distance: " << gps.location.isValid() << ",  " << targetHeading1 << " , " << distanceToTarget1 << endl;
+  //telem << "process GPS: Target Heading/Distance: " << gps.location.isValid() << ",  " << targetHeading1 << " , " << distanceToTarget1 << endl;
   
   if(telem.available() > 0) {
 	  int val = telem.read();  //read telem input commands  
@@ -102,7 +102,7 @@ void calcDesiredTurn(void)
     // calculate where we need to turn to head to destination
     headingError = targetHeading - wp_heading;
 	
-    telem << "CalcDesired: Target/Current Heading: " << targetHeading << " , " << wp_heading << endl;
+    //telem << "CalcDesired: Target/Current Heading: " << targetHeading << " , " << wp_heading << endl;
     telem << "Heading Error = " << headingError << endl << endl;
 	
     // adjust for compass wrap
@@ -130,14 +130,19 @@ void moveAndAvoid(void)
 		while(abs(headingError) > HEADING_TOLERANCE && wp_mode_toggle == 1) {
 			if (turnDirections == 1) {
 				throttleLeft = throttleRight = FAST_SPEED;
-			} else if(turnDirections == 2){
-					throttleLeft =  TURN_SPEED;
+			}
+			
+			if(turnDirections == 2){
+					throttleLeft =  turnSpeed;
 					throttleRight = TURN_SPEED_DIFF;
-				} else if(turnDirections == 3) {
-						throttleRight =  TURN_SPEED;
-						throttleLeft = TURN_SPEED_DIFF;
+				}
+				
+			if(turnDirections == 3) {
+					throttleRight =  turnSpeed;
+					throttleLeft = TURN_SPEED_DIFF;
 					}
-			//telem << "Direction: " << turnDirections << endl;
+        
+			telem << "Direction: " << turnDirections << endl;
       if(gps_waypoint_timer > defaultWayPointTime) {
 			  mForward();
 			  processGPS();

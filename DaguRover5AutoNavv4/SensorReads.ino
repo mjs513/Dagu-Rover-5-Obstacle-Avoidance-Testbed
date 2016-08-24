@@ -186,13 +186,11 @@ void send_telemetry(){
       telem << etm_millis.elapsed()/1000. << ",";
       currentLat = gps.location.lat();
       currentLong = gps.location.lng();
-      
+
       telem << _FLOAT(currentLat,6);
       telem << "," << _FLOAT(currentLong,6) << "," << gps.location.isValid();
+      telem << "," << gps.hdop.value() << "," << pdop.value();
       telem << "," << gps.speed.mps() << "," << gps.course.deg() << ",";
-
-      while (ss.available() > 0) 
-          gps.encode(ss.read()); 
 
       // IMU
       compass_update();
@@ -215,10 +213,10 @@ void send_telemetry(){
 void gps_ready() {
 	while(1){
 	  if(gps.satellites.value() < 5 || gps.satellites.isValid() == 0 || gps.hdop.value() > 110 ||
-		  gps.hdop.isValid() == 0 || gps.location.isValid() == 0) {
+		  gps.hdop.isValid() == 0 || gps.location.isValid() == 0 || atof(pdop.value()) > 2.0) {
         telem << "Acquiring GPS Fix => " << gps.satellites.value() << ",  " << gps.satellites.isValid();
-        telem <<  ",  " << gps.hdop.value() <<  ",  " << gps.hdop.isValid() <<  ",  ";
-        telem << gps.location.isValid() << endl;
+        telem <<  ",  " << gps.hdop.value() <<  ",  " << gps.hdop.isValid() <<  ",  " << pdop.value();
+        telem <<   ",  " << gps.location.isValid() << endl;
         smartDelay(1000);
         
         if(telem.available() > 0 ) {

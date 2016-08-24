@@ -26,15 +26,15 @@ void pivotTo(int target){
     telem << "\t" << currentAngle << ", " << target << ", " << diff << endl;
     
     if(diff > 0) {
-	    throttleRight = FAST_SPEED;
-	    throttleLeft = SLOW_SPEED;
+	    throttleRight = turnSpeed;
+	    throttleLeft = turnSpeed;
       mRight();//right
-      delay(10);
+      delay(50);
     } else {
-	    throttleRight = SLOW_SPEED;
-	    throttleLeft = FAST_SPEED;
+	    throttleRight = turnSpeed;
+	    throttleLeft = turnSpeed;
       mLeft();//left
-      delay(10);
+      delay(50);
     }
     
     if(abs(diff) < HEADING_TOLERANCE){

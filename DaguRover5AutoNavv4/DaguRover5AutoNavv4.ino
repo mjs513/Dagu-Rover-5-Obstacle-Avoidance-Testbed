@@ -136,6 +136,23 @@ Servo headservo;
 // The TinyGPS++ object
 TinyGPSPlus gps;
 
+/* Taken from TinyGPS
+   By declaring TinyGPSCustom objects like this, we announce that we
+   are interested in the 15th, 16th, and 17th fields in the $GPGSA 
+   sentence, respectively the PDOP (F("positional dilution of precision")),
+   HDOP (F("horizontal...")), and VDOP (F("vertical...")).
+
+   (Counting starts with the field immediately following the sentence name, 
+   i.e. $GPGSA.  For more information on NMEA sentences, consult your
+   GPS module's documentation and/or http://aprs.gids.nl/nmea/.)
+
+   If your GPS module doesn't support the $GPGSA sentence, then you 
+   won't get any output from this program.
+*/
+
+TinyGPSCustom pdop(gps, "GNGSA", 15); // $GPGSA sentence, 15th element
+//TinyGPSCustom vdop(gps, "GNGSA", 17); // $GPGSA sentence, 17th element
+
 RTC_DS3231 rtc; 
 StopWatch etm_millis;
 
@@ -352,6 +369,7 @@ void loop(){
 	   
       case 'g':
        if(turn_time_mult == 2) {
+        telem << "Activated Carpet Setting" << endl;
         obsDist = 47; //was 47
         sidedistancelimit = 27;  // was 27
         fowardheadThreshold = 27; //was 49, 39, 29; was 27
@@ -360,35 +378,37 @@ void loop(){
         sideSensorThreshold = 27; //was 42; was 27
         gnd_type = 2;  // carpet
 		
-		// Speeds (range: 0 - 255)
-		FAST_SPEED = 150;
-		TURN_SPEED_DIFF = 100;
+        // Speeds (range: 0 - 255)
+        FAST_SPEED = 150;
+        TURN_SPEED_DIFF = 100;
        } else if(turn_time_mult == 1) {
-			gnd_type = 1;  // hardwood
-			obsDist = 47; //was 47
-			sidedistancelimit = 37;  // was 27
-			fowardheadThreshold = 37; //was 49, 39, 29; was 27
-			lcThreshold = 36;         // was 47,27; was 26
-			lcIRthreshold = 35;  //was 45, last 47; was 27
-			sideSensorThreshold = 37; //was 42; was 27
-			max_IR_distance = 200;
+          telem << "Activated Hardwood Setting" << endl;
+          gnd_type = 1;  // hardwood
+          obsDist = 47; //was 47
+          sidedistancelimit = 37;  // was 27
+          fowardheadThreshold = 37; //was 49, 39, 29; was 27
+          lcThreshold = 36;         // was 47,27; was 26
+          lcIRthreshold = 35;  //was 45, last 47; was 27
+          sideSensorThreshold = 37; //was 42; was 27
+          max_IR_distance = 200;
 
-			backupSensorThreshold = 17;		//17.78 - not implemented yet
-			backup_high = 500;
-			backup_low = 100;
+          backupSensorThreshold = 17;		//17.78 - not implemented yet
+          backup_high = 500;
+          backup_low = 100;
 
-			//Set Motor Speed
-			speed = 50;
-			turnSpeed = 150;
-			lf_mtr_adj = 1.5;
-			rr_mtr_adj = 0.97;
-			lr_mtr_adj = 1.15;
-			rf_mtr_adj = 1.0;
+          //Set Motor Speed
+          speed = 50;
+          turnSpeed = 150;
+          lf_mtr_adj = 1.5;
+          rr_mtr_adj = 0.97;
+          lr_mtr_adj = 1.15;
+          rf_mtr_adj = 1.0;
 			
-			// Speeds (range: 0 - 255)
-			FAST_SPEED = 150;
-			TURN_SPEED_DIFF = 100;
+          // Speeds (range: 0 - 255)
+          FAST_SPEED = 150;
+          TURN_SPEED_DIFF = 100;
 		} else if(turn_time_mult == 3) {
+        telem << "Activated Grass settings" << endl;
 				gnd_type = 3;  // grass for waypoint
 				obsDist = 47; //was 47
 				sidedistancelimit = 37;  // was 27
@@ -419,6 +439,7 @@ void loop(){
       case 'f' : 
         motorFwdRunTime = 0;
         motorFwd = 0;
+        set_speed(speed);
         
         telem.println("Rolling Forward!");
         gDirection = DIRECTION_FORWARD;
@@ -453,6 +474,7 @@ void loop(){
       //telem << "Current heading: " << yar_heading << endl;
       //telem << "Turn Multiplier: " << turn_time_mult << endl;
       telem.println("Turning Left!");
+      set_speed(turnSpeed);
       mLeft();
       //delay(400);  //was 2000
       delay(turn_time_mult * 100);
@@ -473,6 +495,7 @@ void loop(){
       //telem.println("Turning Right!");
       //compass_update();
       //telem << "Current heading: " << yar_heading << endl;
+      set_speed(turnSpeed);
       mRight();
       //delay(400);
       delay(turn_time_mult * 100);
@@ -488,6 +511,7 @@ void loop(){
       motorRevTime = 0;    
       telem.println("Moving Backward!");
       //moveBackward(motorSpeed);
+      set_speed(speed);
       mBackward();
       while(motorRevTime < defaultRevTime) {
         }
@@ -502,6 +526,7 @@ void loop(){
       
     case 't' :      
       telem.println("toggle Roam Mode"); 
+      set_speed(speed);
       toggleRoam();
       break;
       
@@ -547,6 +572,11 @@ void loop(){
     toggleWP();
     }	  
 	  
+}
+
+void set_speed(int motor_speed) {
+  throttleLeft = motor_speed;
+  throttleRight = motor_speed;
 }
 
 
