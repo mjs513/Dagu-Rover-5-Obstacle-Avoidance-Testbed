@@ -84,7 +84,7 @@ void processGPS(void)
   targetHeading = (float) targetHeading1;
   distanceToTarget = distanceToTarget1;
   
-  //telem << "process GPS: Target Heading/Distance: " << gps.location.isValid() << ",  " << targetHeading1 << " , " << distanceToTarget1 << endl;
+  telem << "process GPS: Target Heading/Distance: " << gps.location.isValid() << ",  " << targetHeading1 << " , " << distanceToTarget1 << endl;
   
   if(telem.available() > 0) {
 	  int val = telem.read();  //read telem input commands  
@@ -114,44 +114,42 @@ void calcDesiredTurn(void)
     // calculate which way to turn to intercept the targetHeading
     if (abs(headingError) <= HEADING_TOLERANCE)      // if within tolerance, don't turn
       turnDirections = 1;  
-    else if (headingError < 0)
+    else if(headingError < 0)
       turnDirections = 2;
-    else if (headingError > 0)
+    else if(headingError > 0)
       turnDirections = 3;
-    else
-      turnDirections = 1;
- 
+     
+    telem << "Direction: " << turnDirections << endl;
+    
 }  // calcDesiredTurn()
 
 
 void moveAndAvoid(void)
 {
 	while(distanceToTarget > WAYPOINT_DIST_TOLERANCE && wp_mode_toggle == 1 ) {
+      if (turnDirections == 1) {
+          set_speed(FAST_SPEED);
+          mForward();
+      }
 		while(abs(headingError) > HEADING_TOLERANCE && wp_mode_toggle == 1) {
-			if (turnDirections == 1) {
-				throttleLeft = throttleRight = FAST_SPEED;
-			}
-			
-			if(turnDirections == 2){
-					throttleLeft =  turnSpeed;
-					throttleRight = TURN_SPEED_DIFF;
-				}
-				
+
+			if(turnDirections == 2){  
+          set_speed(turnSpeed);
+          mLeft();
+      }
+
 			if(turnDirections == 3) {
-					throttleRight =  turnSpeed;
-					throttleLeft = TURN_SPEED_DIFF;
-					}
+          set_speed(turnSpeed);
+          mRight();
+      }
         
-			telem << "Direction: " << turnDirections << endl;
-      if(gps_waypoint_timer > defaultWayPointTime) {
-			  mForward();
+      if(gps_waypoint_timer > defaultWayPointTime) {;
 			  processGPS();
 			  calcDesiredTurn();
       }
       send_telemetry();
 		}
     if(gps_waypoint_timer > defaultWayPointTime) {
-       mForward();
        processGPS();
        calcDesiredTurn();
     }
