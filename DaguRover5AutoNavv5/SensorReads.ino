@@ -179,18 +179,22 @@ int rearIRaverage(int average_count) {
 void send_telemetry(){     
     //===  Telemetry section =========
     if(telem_timer > defaultTelemTime) {
-      DateTime time = rtc.now();
-      telem << time.timestamp(DateTime::TIMESTAMP_TIME);
+      //DateTime time = rtc.now();
+      //telem << time.timestamp(DateTime::TIMESTAMP_TIME);
+      telem << coherent.dateTime.hours << ":" << coherent.dateTime.minutes << ":";
+      telem << coherent.dateTime.seconds << "." <<coherent.dateTime_cs;
       telem << ",";
 
       telem << etm_millis.elapsed()/1000. << ",";
-
-      currentLong = gps.location.lng();
-      currentLat = gps.location.lat();
-      telem << _FLOAT(currentLat,8);
-      telem << "," << _FLOAT(currentLong,8) << "," << gps.location.isValid();
-      telem << "," << gps.hdop.value() << "," << pdop.value();
-      telem << "," << gps.speed.mps() << "," << gps.course.deg() << ",";
+      
+      coherent = gps.read();
+      currentLong = coherent.longitudeL();
+      currentLat = coherent.latitudeL();
+      
+      telem << currentLat;
+      telem << "," << currentLong << "," << coherent.valid.location;
+      telem << "," << coherent.hdop << "," << coherent.pdop;
+      telem << "," << coherent.speed() << "," << coherent.heading() << ",";
     
       // IMU
       compass_update();
@@ -211,13 +215,14 @@ void send_telemetry(){
 }
 
 void gps_ready() {
-	while(1){
-	  if(gps.satellites.value() < 5 || gps.satellites.isValid() == 0 || gps.hdop.value() > 110 ||
-		  gps.hdop.isValid() == 0 || gps.location.isValid() == 0 || atof(pdop.value()) > 2.0) {
-        telem << "Acquiring GPS Fix => " << gps.satellites.value() << ",  " << gps.satellites.isValid();
-        telem <<  ",  " << gps.hdop.value() <<  ",  " << gps.hdop.isValid() <<  ",  " << pdop.value();
-        telem <<   ",  " << gps.location.isValid() << endl;
-        smartDelay(1000);
+
+	while(gps.available( gps_port )){
+    coherent = gps.read();
+	  if(coherent.satellites < 8 || coherent.valid.location == 0 || coherent.hdop > 1100 ||
+		   coherent.pdop > 2000) {
+        telem << "Acquiring GPS Fix => " << coherent.satellites << ",  " ;
+        telem <<  ",  " << coherent.hdop <<  ",  " << coherent.pdop;
+        telem <<   ",  " << coherent.valid.location << endl;
         
         if(telem.available() > 0 ) {
           int val = telem.read();  //read telem input commands  
@@ -226,24 +231,23 @@ void gps_ready() {
             return;
           }
         }
+  #ifdef NMEAGPS_PARSE_GST
+    // Now is a good time to ask for a GST.  Most GPS devices
+    //   do not send GST, and some GPS devices may not even
+    //   respond to this poll.  Other may let you request
+    //   these messages once per second by sending a 
+    //   configuration command in setup().
+    gps.poll( &gps_port, NMEAGPS::NMEA_GST );
+  #endif
+        delay(100);
 		  } else {
+        telem << "GPS PORT NOT AVAILABLE !" << endl << endl;
         return;
 		  }
 	}
 }
 
 
-// This custom version of delay() ensures that the gps object
-// is being "fed".
-static void smartDelay(unsigned long ms)
-{
-  unsigned long start = millis();
-  do 
-  {
-    while (ss.available())
-      gps.encode(ss.read());
-  } while (millis() - start < ms);
-}
 
 
 

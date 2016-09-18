@@ -25,7 +25,7 @@
 //#define telem Serial3 // telemetry
 
 // The serial connection to the GPS device
-#define ss Serial2
+//#define gps_port Serial2
 
 //Enable 400Khz I2C bus speed
 const boolean fastmode = true;
@@ -98,7 +98,7 @@ const int head_rdiag = 135;
 #define defaultTurnTime 1000
 #define defaultFwdTime 7000
 #define defaultRevTime 700
-#define defaultTelemTime 100
+#define defaultTelemTime 200
 #define defaultWayPointTime 50
 
 //Bubble Rebound Parameters
@@ -182,16 +182,16 @@ uint32_t ulProgramModeExitTime = 0;
 int waypointNumber = -1;            // current waypoint number; will run from 0 to (NUMBER_WAYPOINTS -1); start at -1 and gets initialized during setup()
 
 struct waypoints {
-    double tLat;
-    double tLong;
+    long tLat;
+    long tLong;
 };
 
 waypoints waypointList[NUMBER_WAYPOINTS] = {
-                                            {40.774674, -73.814664},
-                                            {40.774664, -73.814612},
-                                            {40.774630, -73.814614},
-                                            {40.774631, -73.814622},
-                                            {40.774614, -73.814669},
+                                            {40774674, -73814664},
+                                            {40774664, -73814612},
+                                            {40774630, -73814614},
+                                            {40774631, -73814622},
+                                            {40774614, -73814669},
                                             {0,0}
                                             };
 
