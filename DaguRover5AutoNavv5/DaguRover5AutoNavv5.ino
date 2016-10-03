@@ -77,6 +77,11 @@
 //      TinyGPSplus works now also for Neo-M8N sensors,
 //      https://github.com/SensorsIot/TinyGPSplus-for-Neo-M8N.git
 //
+//
+//    : NeoGPS Library, https://github.com/SlashDevin/NeoGPS
+//      This fully-configurable Arduino library uses minimal RAM, PROGMEM and CPU time, 
+//      requiring as few as 10 bytes of RAM, 866 bytes of PROGMEM, and less than 1mS of 
+//      CPU time per sentence.
 //============================================================================================
 // rcarduino.blogspot.com
 //
@@ -106,6 +111,10 @@
 //
 // rcarduino.blogspot.com
 //
+// ==================================================================
+// Utilities:
+//    Teensy 3.2 Interrupt, https://forum.pjrc.com/threads/35733-Teensy-3-2-Interrupt
+// 
 // -------------------------------------------------------------------
 
 #include <StandardCplusplus.h>
@@ -122,7 +131,6 @@
 #include <utility/imumaths.h>
 
 #include <StopWatch.h>
-#include "NMEAGPS.h"
 #include <Streaming.h>
 #include <elapsedMillis.h>
 
@@ -132,39 +140,7 @@
 #include "IOpins.h"
 
 Servo headservo;
-// The TinyGPS++ object
-//------------------------------------------------------------
-#define gps_port Serial2
 
-// Check that the config files are set up properly
-
-#if !defined( NMEAGPS_PARSE_GGA ) & !defined( NMEAGPS_PARSE_GLL ) & \
-    !defined( NMEAGPS_PARSE_GSA ) & !defined( NMEAGPS_PARSE_GSV ) & \
-    !defined( NMEAGPS_PARSE_RMC ) & !defined( NMEAGPS_PARSE_VTG ) & \
-    !defined( NMEAGPS_PARSE_ZDA ) & !defined( NMEAGPS_PARSE_GST ) & \
-    !defined( NMEAGPS_RECOGNIZE_ALL )
-  #error No NMEA sentences enabled
-#endif
-
-//#ifndef NMEAGPS_COHERENT
-//  #error You must define NMEAGPS_COHERENT in NMEAGPS_cfg.h!
-//#endif
-
-#ifdef NMEAGPS_NO_MERGING
-  #error You must define EXPLICIT or IMPLICIT merging in NMEAGPS_cfg.h!
-#endif
-
-#ifdef NMEAGPS_INTERRUPT_PROCESSING
-  #error You must *NOT* define NMEAGPS_INTERRUPT_PROCESSING in NMEAGPS_cfg.h!
-#endif
-
-//------------------------------------------------------------
-
-static NMEAGPS gps;
-static gps_fix coherent;
-
-
-//----------------------------------------------------------------
 
 StopWatch etm_millis;
 
@@ -262,41 +238,46 @@ int tDeadZoneRange, sDeadZoneRange;
 int wp_mode_toggle = 0;
 
 // Compass navigation
-double targetHeading,              // where we want to go to reach current waypoint
-	  currentHeading,             // where we are actually facing now
-      wp_heading,
-      distanceToTarget,            // current distance to target (current waypoint)
-    originalDistanceToTarget,
-	  headingError;               // signed (+/-) difference between targetHeading and currentHeading
+
+// Compass navigation
+float targetHeading,              // where we want to go to reach current waypoint
+      currentHeading,             // where we are actually facing now
+      headingError;               // signed (+/-) difference between targetHeading and currentHeading
 
 // GPS Navigation
-long currentLat,
+float wp_heading,
+      distanceToTarget,            // current distance to target (current waypoint)
+      originalDistanceToTarget;    // distance to original waypoing when we started navigating to it
+
+//GPS Globals
+float currentLat, 
       currentLong,
       targetLat,
       targetLong;
+int   hdop, 
+      pdop, 
+      sv,
+      gps_valid;
+float cog, 
+      sog;
+String  utc, 
+        gpsdata;
+int   readonce, 
+      val1;
 
 
 // ***** End Waypoint Navigation globals
 
 void setup(){
 	telem.begin(57600);
+  gps.begin(GPSBaud);  //GPS Device Baud Rate
+  
 	telem.println("Rover 5 Obstacle Avoidance");
+  
+  Wire.begin();
 
-  // Check configuration
-  #if !defined( NMEAGPS_PARSE_GGA ) & !defined( NMEAGPS_PARSE_GLL ) & \
-      !defined( NMEAGPS_PARSE_GSA ) & !defined( NMEAGPS_PARSE_GSV ) & \
-      !defined( NMEAGPS_PARSE_RMC ) & !defined( NMEAGPS_PARSE_VTG ) & \
-      !defined( NMEAGPS_PARSE_ZDA ) & !defined( NMEAGPS_PARSE_GST ) & \
-      defined( NMEAGPS_RECOGNIZE_ALL )
-      telem.println( F("\nWARNING: No NMEA sentences are enabled: no fix data will be displayed.") );
-  #endif
-
-	Wire.begin();
-	gps_port.begin(115200);  //GPS Device Baud Rate
-
-  #ifdef NMEAGPS_PARSE_GST
-    gps.poll( &gps_port, NMEAGPS::NMEA_GST );
-  #endif
+  readonce = 0;
+  gps_ready();
   
   //Real Time Clock
 	//rtc.begin();
@@ -381,6 +362,7 @@ void setup(){
 }
 
 void loop(){
+
   while (telem.available() > 0) {
     int val = telem.read();	//read telem input commands
 

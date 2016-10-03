@@ -179,22 +179,16 @@ int rearIRaverage(int average_count) {
 void send_telemetry(){     
     //===  Telemetry section =========
     if(telem_timer > defaultTelemTime) {
+      gps_read();
       //DateTime time = rtc.now();
       //telem << time.timestamp(DateTime::TIMESTAMP_TIME);
-      telem << coherent.dateTime.hours << ":" << coherent.dateTime.minutes << ":";
-      telem << coherent.dateTime.seconds << "." <<coherent.dateTime_cs;
-      telem << ",";
+      telem << utc << ",";
 
       telem << etm_millis.elapsed()/1000. << ",";
-      
-      coherent = gps.read();
-      currentLong = coherent.longitudeL();
-      currentLat = coherent.latitudeL();
-      
-      telem << currentLat;
-      telem << "," << currentLong << "," << coherent.valid.location;
-      telem << "," << coherent.hdop << "," << coherent.pdop;
-      telem << "," << coherent.speed() << "," << coherent.heading() << ",";
+           
+      telem << _FLOAT(currentLat, 6) << "," << _FLOAT(currentLong, 6) << "," << gps_valid;
+      telem << "," << hdop << "," << pdop;
+      telem << "," << sog << "," << cog << ",";
     
       // IMU
       compass_update();
@@ -213,40 +207,6 @@ void send_telemetry(){
       encA.write(0); encB.write(0); encC.write(0); encD.write(0);
     }
 }
-
-void gps_ready() {
-
-	while(gps.available( gps_port )){
-    coherent = gps.read();
-	  if(coherent.satellites < 8 || coherent.valid.location == 0 || coherent.hdop > 1100 ||
-		   coherent.pdop > 2000) {
-        telem << "Acquiring GPS Fix => " << coherent.satellites << ",  " ;
-        telem <<  ",  " << coherent.hdop <<  ",  " << coherent.pdop;
-        telem <<   ",  " << coherent.valid.location << endl;
-        
-        if(telem.available() > 0 ) {
-          int val = telem.read();  //read telem input commands  
-          if(val == 'p') {
-            telem.println("Returning to main"); 
-            return;
-          }
-        }
-  #ifdef NMEAGPS_PARSE_GST
-    // Now is a good time to ask for a GST.  Most GPS devices
-    //   do not send GST, and some GPS devices may not even
-    //   respond to this poll.  Other may let you request
-    //   these messages once per second by sending a 
-    //   configuration command in setup().
-    gps.poll( &gps_port, NMEAGPS::NMEA_GST );
-  #endif
-        delay(100);
-		  } else {
-        telem << "GPS PORT NOT AVAILABLE !" << endl << endl;
-        return;
-		  }
-	}
-}
-
 
 
 

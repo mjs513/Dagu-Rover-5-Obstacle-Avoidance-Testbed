@@ -2,7 +2,7 @@ void WaypointNav() {
   //
   // Wait for GPS to get signal
   #ifndef NO_GPS_WAIT
-  while (!coherent.valid.location)  // wait for fix, updating display with each new NMEA sentence received
+  while (!gps_valid)  // wait for fix, updating display with each new NMEA sentence received
     {
       send_telemetry();
       // loop until fix established
@@ -64,20 +64,33 @@ void nextWaypoint(void)
 // Called after new GPS data is received; updates our position and course/distance to waypoint
 void processGPS(void)
 {
-  NeoGPS::Location_t wayPoint( targetLat, targetLong ); 
-  coherent = gps.read();           
+  //float gps_Lat = kFilters[0].measureRSSI(gps.location.lat());
+  //float gps_Lng = kFilters[1].measureRSSI(gps.location.lng());
+  gps_read();
+  
   // update the course and distance to waypoint based on our new position
-  double distanceToTarget1 =
-    (NeoGPS::Location_t::DistanceKm( coherent.location, wayPoint ))*1000;
+  float distanceToTarget1 =
+    distanceBetween(
+      currentLat,
+      currentLong,
+      targetLat, 
+      targetLong);
 
   //course to targetLat
-  double targetHeading1 =
-    NeoGPS::Location_t::BearingToDegrees( coherent.location, wayPoint );
-
-  targetHeading = (float) targetHeading1;
+   float targetHeading1 =
+      courseTo(
+        currentLat,
+        currentLong,
+        targetLat, 
+        targetLong);
+        
+  targetHeading = targetHeading1;
   distanceToTarget = distanceToTarget1;
+
+  telem << "process GPS: Target Heading/Distance: "   << targetHeading1 << " , " << distanceToTarget1 << endl;
+  telem  << endl;
   
-  telem << "process GPS: Target Heading/Distance: " << coherent.valid.location << ",  " << targetHeading1 << " , " << distanceToTarget1 << endl;
+  telem << "process GPS: Target Heading/Distance: " << gps_valid << ",  " << targetHeading1 << " , " << distanceToTarget1 << endl;
   
   if(telem.available() > 0) {
 	  int val = telem.read();  //read telem input commands  
