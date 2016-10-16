@@ -214,6 +214,8 @@ uint32_t ulSteeringStart;
 
 uint8_t throttleLeft;
 uint8_t throttleRight;
+int pivotLeft;
+int pivotRight;
 //
 
 void setup(){
@@ -268,13 +270,16 @@ void setup(){
 
     //signal output port
     //set all of the outputs for the motor driver
-    
+    pinMode(pwm_lf, OUTPUT);
 	pinMode(dir_lf, OUTPUT);
 	pinMode(CURRENTLF, INPUT);
+	pinMode(pwm_rr, OUTPUT);
 	pinMode(dir_rr, OUTPUT); 
 	pinMode(CURRENTRR, INPUT);
+	pinMode(pwm_lr, OUTPUT);
 	pinMode(dir_lr, OUTPUT); 
 	pinMode(CURRENTLR, INPUT);
+	pinMode(pwm_rf, OUTPUT);
 	pinMode(dir_rf, OUTPUT); 
 	pinMode(CURRENTRF, INPUT);
 	
@@ -495,12 +500,5 @@ int IsTime(unsigned long *timeMark, unsigned long timeInterval){
   }
   return(result);  
 }
-
-
-
-
-
-
-
 
 

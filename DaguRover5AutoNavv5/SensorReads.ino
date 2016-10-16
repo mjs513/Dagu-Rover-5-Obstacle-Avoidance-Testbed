@@ -209,5 +209,33 @@ void send_telemetry(){
 }
 
 
+void send_telemetry_wp(){     
+    //===  Telemetry section =========
+      //gps_read();
+      //DateTime time = rtc.now();
+      //telem << time.timestamp(DateTime::TIMESTAMP_TIME);
+      telem << utc << ",";
 
+      telem << etm_millis.elapsed()/1000. << ",";
+           
+      telem << _FLOAT(currentLat, 6) << "," << _FLOAT(currentLong, 6) << "," << gps_valid;
+      telem << "," << hdop << "," << pdop;
+      telem << "," << sog << "," << cog << ",";
+    
+      // IMU
+      compass_update();
+      telem << -roll << "," << -pitch << "," << yar_heading << ",";
+      telem << wp_heading << ",";
+
+      //Direction
+      telem << "," << gDirection << ",";
+
+      //Wheel Encoders
+      // zeros out encoder counts and reads encoders zero value
+      //encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+      getTicks_noreset();
+
+      telem_timer = 0;
+      encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+}
 

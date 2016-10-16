@@ -171,6 +171,8 @@ void send_telemetry(){
 
       telem << etm_millis.elapsed()/1000. << ",";
       
+      gps.encode(ss.read());
+      
       telem << Lat.value() << "," << Long.value();
       telem << "," << SOG.value() << "," << SOG.value() << ",";
 

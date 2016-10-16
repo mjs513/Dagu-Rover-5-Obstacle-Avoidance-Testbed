@@ -105,16 +105,16 @@ const int N = 25;  //was 10, 12 for 12 readings, was 12
 const int angle = 7.5;  //was 20 degrees, was 15 for 12
 
 //rcarduino constants
-#define RC_NEUTRAL_STEERING 1504  //1504 was 1506
+#define RC_NEUTRAL_STEERING 1506  //1504 was 1506
 #define RC_NEUTRAL_THROTTLE 1511  //1500 was 1511
 
 #define RC_MAX_STEERING 1996
 #define RC_MAX_THROTTLE 2000
 
-#define RC_MIN_STEERING 1012  //1012 was 1016
-#define RC_MIN_THROTTLE 1012  //1012 was 1014
+#define RC_MIN_STEERING 1016  //1012 was 1016
+#define RC_MIN_THROTTLE 1014  //1012 was 1014
 
-#define RC_DEADBAND 100
+#define RC_DEADBAND 50
 
 uint16_t unSteeringMin = RC_MIN_THROTTLE;
 uint16_t unSteeringMax = RC_MAX_STEERING;
@@ -157,13 +157,15 @@ uint8_t gThrottleDirection = DIRECTION_STOP;
 uint8_t gDirection = DIRECTION_STOP;
 uint8_t gOldDirection = DIRECTION_STOP;
 
-#define IDLE_MAX 80
+#define IDLE_MAX 90
 
 #define MODE_RUN 1
 #define MODE_PROGRAM 0
 
 uint8_t gMode = MODE_RUN;
 uint32_t ulProgramModeExitTime = 0; 
+
+
 
 
 

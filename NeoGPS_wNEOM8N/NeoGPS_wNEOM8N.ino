@@ -98,8 +98,8 @@ static void doSomeWork( const gps_fix & fix )
     telem << coherent.latitudeL() << "," << coherent.longitudeL() << ",";
     telem << coherent.hdop << "," << coherent.pdop << "," << coherent.speed() <<  ","  ;
     telem << coherent.heading() << "," <<coherent.satellites << ",";
-    telem << coherent.dateTime << "." << coherent.dateTime_cs <<", " << coherent.valid.location;
-    telem << '\n' << endl;
+    telem << coherent.dateTime << "." << coherent.dateTime_cs <<"," << coherent.valid.location;
+    telem << "," << '\n' << endl;
     
     telem.flush();
     //delay(1000);

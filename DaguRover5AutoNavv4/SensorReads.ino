@@ -184,11 +184,14 @@ void send_telemetry(){
       telem << ",";
 
       telem << etm_millis.elapsed()/1000. << ",";
-
-      currentLong = gps.location.lng();
-      currentLat = gps.location.lat();
-      telem << _FLOAT(currentLat,8);
-      telem << "," << _FLOAT(currentLong,8) << "," << gps.location.isValid();
+      
+      while (ss.available())
+        gps.encode(ss.read());
+        //currentLong = gps.location.lng();
+        //currentLat = gps.location.lat();}
+      
+      telem << _FLOAT(gps.location.lat(),8);
+      telem << "," << _FLOAT(gps.location.lng(),8) << "," << gps.location.isValid();
       telem << "," << gps.hdop.value() << "," << pdop.value();
       telem << "," << gps.speed.mps() << "," << gps.course.deg() << ",";
     
@@ -207,6 +210,7 @@ void send_telemetry(){
 
       telem_timer = 0;
       encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+
     }
 }
 

@@ -277,7 +277,7 @@ void setup(){
   Wire.begin();
 
   readonce = 0;
-  gps_ready();
+  //gps_ready();
   
   //Real Time Clock
 	//rtc.begin();
@@ -309,6 +309,7 @@ void setup(){
 	//==================================================
 	// Initial Adafruit BNO055
 	//==================================================
+  telem.println("Initialization of BNO055 Started");
     
 	BNO055_Init();
 	delay(100);

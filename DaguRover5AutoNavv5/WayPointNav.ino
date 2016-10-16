@@ -2,9 +2,9 @@ void WaypointNav() {
   //
   // Wait for GPS to get signal
   #ifndef NO_GPS_WAIT
-  while (!gps_valid)  // wait for fix, updating display with each new NMEA sentence received
+  while (gps_valid == 1)  // wait for fix, updating display with each new NMEA sentence received
     {
-      send_telemetry();
+      send_telemetry_wp();
       // loop until fix established
     } // while (!GPS.fix)
   #endif
@@ -29,7 +29,7 @@ void executeWaypointNav(void){
 		compass_update();    // get our current heading
 		currentHeading = wp_heading;
 		calcDesiredTurn(); 
-	
+	      telem << "Going to move and avoid" << endl;
 		// distance in front of us, move, and avoid obstacles as necessary
 		moveAndAvoid();
 	}
@@ -44,7 +44,7 @@ void nextWaypoint(void)
   targetLat = waypointList[waypointNumber].tLat;
   targetLong = waypointList[waypointNumber].tLong;
 
-  //telem << "Target Lat/Long: " << _FLOAT(targetLat,6) << " , " << _FLOAT(targetLong,6) << endl;
+  telem << "Target Lat/Long: " << _FLOAT(targetLat,6) << " , " << _FLOAT(targetLong,6) << endl;
   
   if ((targetLat == 0 && targetLong == 0) || waypointNumber >= NUMBER_WAYPOINTS && wp_mode_toggle == 1)    // last waypoint reached? 
     {
@@ -53,7 +53,6 @@ void nextWaypoint(void)
       executeWaypointNav;
 	}
 
-    
    processGPS();
    //distanceToTarget = originalDistanceToTarget = distanceToWaypoint();
    
@@ -67,7 +66,7 @@ void processGPS(void)
   //float gps_Lat = kFilters[0].measureRSSI(gps.location.lat());
   //float gps_Lng = kFilters[1].measureRSSI(gps.location.lng());
   gps_read();
-  
+
   // update the course and distance to waypoint based on our new position
   float distanceToTarget1 =
     distanceBetween(
@@ -90,7 +89,7 @@ void processGPS(void)
   telem << "process GPS: Target Heading/Distance: "   << targetHeading1 << " , " << distanceToTarget1 << endl;
   telem  << endl;
   
-  telem << "process GPS: Target Heading/Distance: " << gps_valid << ",  " << targetHeading1 << " , " << distanceToTarget1 << endl;
+  //telem << "process GPS: Target Heading/Distance: " << gps_valid << ",  " << targetHeading1 << " , " << distanceToTarget1 << endl;
   
   if(telem.available() > 0) {
 	  int val = telem.read();  //read telem input commands  
@@ -137,6 +136,7 @@ void moveAndAvoid(void)
           set_speed(FAST_SPEED);
           mForward();
       }
+      
 		while(abs(headingError) > HEADING_TOLERANCE && wp_mode_toggle == 1) {
 
 			if(turnDirections == 2){  
@@ -148,18 +148,19 @@ void moveAndAvoid(void)
           set_speed(turnSpeed);
           mRight();
       }
-        
-      if(gps_waypoint_timer > defaultWayPointTime) {;
+      
+        delay(defaultWayPointTime);
 			  processGPS();
 			  calcDesiredTurn();
-      }
-      send_telemetry();
+        send_telemetry_wp();
+        gps_waypoint_timer = 0;
+        
 		}
-    if(gps_waypoint_timer > defaultWayPointTime) {
-       processGPS();
-       calcDesiredTurn();
-    }
-    send_telemetry();
+        delay(defaultWayPointTime);
+        processGPS();
+        calcDesiredTurn();
+        send_telemetry_wp();
+        gps_waypoint_timer = 0;
 	}
 	
 	mStop();  // stop and get next waypoint from list

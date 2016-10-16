@@ -98,8 +98,8 @@ const int head_rdiag = 135;
 #define defaultTurnTime 1000
 #define defaultFwdTime 7000
 #define defaultRevTime 700
-#define defaultTelemTime 100
-#define defaultWayPointTime 50
+#define defaultTelemTime 1000
+#define defaultWayPointTime 1000
 
 //Bubble Rebound Parameters
 const float V = 21;

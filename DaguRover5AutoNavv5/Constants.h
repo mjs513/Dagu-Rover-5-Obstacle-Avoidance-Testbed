@@ -78,7 +78,8 @@ const int right_57 = 519;	//was 636 for 57, 519 for 45
 //compass reads
 const int compass_avg_cnt = 20;
 const float alpha = 0.5;
-#define DEC_ANGLE -13.1603  // -13.1603 degrees for Flushing, NY
+//#define DEC_ANGLE -13.1603  // -13.1603 degrees for Flushing, NY
+#define DEC_ANGLE 0
 
 //sets up servo angles
 const int head_fwd = 90; 
@@ -98,8 +99,8 @@ const int head_rdiag = 135;
 #define defaultTurnTime 1000
 #define defaultFwdTime 7000
 #define defaultRevTime 700
-#define defaultTelemTime 1010
-#define defaultWayPointTime 1010
+#define defaultTelemTime 1000
+#define defaultWayPointTime 1100
 
 //Bubble Rebound Parameters
 const float V = 21;
@@ -187,11 +188,11 @@ struct waypoints {
 };
 
 waypoints waypointList[NUMBER_WAYPOINTS] = {
-                                            {40.774674, -73.814664},
-                                            {40.774664, -73.814612},
-                                            {40.774630, -73.814614},
-                                            {40.774631, -73.814622},
-                                            {40.774614, -73.814669},
+                                            {40.774662, -73.814659},
+                                            {40.774643, -73.814609},
+                                            {40.774615, -73.814666},
+                                            {40.774662, -73.814659},
+                                            {40.774616, -73.814648},
                                             {0,0}
                                             };
 

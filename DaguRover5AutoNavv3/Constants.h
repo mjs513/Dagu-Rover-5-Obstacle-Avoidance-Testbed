@@ -21,7 +21,7 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //============================================================================
 
-#define telem Serial3
+#define telem Serial
 //#define telem Serial3 // bluetooth
 
 // The serial connection to the GPS device

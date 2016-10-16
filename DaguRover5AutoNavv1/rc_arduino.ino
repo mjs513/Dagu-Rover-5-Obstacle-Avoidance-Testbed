@@ -65,20 +65,20 @@
       
 		  if(unThrottleIn < unThrottleCenter) 
 		  { 
-		  gThrottle = map(unThrottleIn, unThrottleCenter, unThrottleMin, PWM_MIN, PWM_MAX );
-		  throttleLeft = throttleRight = gThrottle;
-		  gThrottleDirection = DIRECTION_REVERSE;
-		  //telem.print("Dir_Fwd:"); telem.println(gThrottle);
+			gThrottle = map(unThrottleIn, unThrottleCenter, unThrottleMin, PWM_MIN, PWM_MAX );
+			throttleLeft = throttleRight = gThrottle;
+			gThrottleDirection = DIRECTION_REVERSE;
+			//telem.print("Dir_Fwd:"); telem.println(gThrottle);
 		  }
-		  else
+		  else 
 		  {
-		  gThrottle = map(unThrottleIn, unThrottleCenter, unThrottleMax, PWM_MIN, PWM_MAX );
-		  throttleLeft = throttleRight = gThrottle;
-		  gThrottleDirection = DIRECTION_FORWARD;
-		  //telem.print("Dir_Rev:"); telem.println(gThrottle);
+			gThrottle = map(unThrottleIn, unThrottleCenter, unThrottleMax, PWM_MIN, PWM_MAX );
+			throttleLeft = throttleRight = gThrottle;
+			gThrottleDirection = DIRECTION_FORWARD;
+			//telem.print("Dir_Rev:"); telem.println(gThrottle);
 		  }
 		}
-    
+   
 		gDirection = gThrottleDirection;
   
 		if(gThrottle < IDLE_MAX) {
@@ -104,7 +104,7 @@
 			throttleRight = gThrottle;
 
 			gDirection = gThrottleDirection;
-			telem.print("Direction: "); telem.println(gDirection);
+			//telem.print("Direction: "); telem.println(gDirection);
     
 			// see previous comments regarding trapping out of range errors
 			// this is left for the user to decide how to handle and flag
@@ -120,13 +120,13 @@
 						gDirection = DIRECTION_ROTATE_LEFT;
 						// use steering to set throttle
 						throttleRight = throttleLeft = map(unSteeringIn, unSteeringCenter, unSteeringMin, PWM_MIN, PWM_MAX);
-						telem.print("Rotate Right: "); telem.println(throttleRight);
+						//telem.print("Rotate Right: "); telem.println(throttleRight);
 					} else if(unSteeringIn > (unSteeringCenter + RC_DEADBAND))
 					{
 						gDirection = DIRECTION_ROTATE_RIGHT;
 						// use steering to set throttle
-						throttleRight = map(unSteeringIn, unSteeringCenter, unSteeringMax, PWM_MIN, PWM_MAX);
-						telem.print("Rotate Left: "); telem.println(throttleRight);
+						throttleRight = throttleLeft = map(unSteeringIn, unSteeringCenter, unSteeringMax, PWM_MIN, PWM_MAX);
+						//telem.print("Rotate Left: "); telem.println(throttleRight);
 					}
 					break;
 				// if not idle proportionally restrain inside track to turn vehicle around it
@@ -158,11 +158,14 @@
 				return;
 			}
 		}
-  
+		
+		//telem.print("Direction Updated: "); telem.println(gDirection);
 		switch(gDirection)
 		{
 		  case DIRECTION_FORWARD:  
-			  mForward();
+			  if(gGear == GEAR_FULL) {
+					mForward();
+				}
 			  break;
 		  case DIRECTION_REVERSE:
 			  mBackward();
@@ -221,4 +224,6 @@ bool rangeTest(uint16_t number, uint16_t lower, uint16_t upper) {
       return false;
     }
 }
+
+
 

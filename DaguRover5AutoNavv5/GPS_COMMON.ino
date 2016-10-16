@@ -1,9 +1,9 @@
 void gps_ready() {
-  gps_read();
-    if(sv < 7 || hdop > 2000 ||
-      gps_valid == 0 || pdop > 2100) {
+    gps_read();
+    if(sv < 7 || (hdop > 2000 && hdop < 0) ||
+       pdop > 2100 || gps_valid == 1) {
         telem << "Acquiring GPS Fix => " << sv << ",  " ;
-        telem <<  ",  " << hdop <<  ",  " << pdop;
+        telem <<  hdop <<  ",  " << pdop;
         telem <<   ",  " << gps_valid << endl;
         
         if(telem.available() > 0 ) {
@@ -39,8 +39,8 @@ void gps_read(){
         hdop = atoi(getValue(gpsdata, ',', 2).c_str());
         pdop = atoi(getValue(gpsdata, ',', 3).c_str());
         sv = atoi(getValue(gpsdata, ',', 6).c_str());
-        sog = atof(getValue(gpsdata, ',', 5).c_str());
-        cog = atoi(getValue(gpsdata, ',', 4).c_str());
+        sog = atof(getValue(gpsdata, ',', 4).c_str());
+        cog = atoi(getValue(gpsdata, ',', 5).c_str());
         utc = getValue(gpsdata, ',', 7).c_str();
         gps_valid = atoi(getValue(gpsdata, ',', 8).c_str());
 
