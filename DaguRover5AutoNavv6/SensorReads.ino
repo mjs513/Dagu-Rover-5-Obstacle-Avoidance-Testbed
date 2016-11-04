@@ -188,7 +188,7 @@ void send_telemetry(){
 
       telem << etm_millis.elapsed()/1000. << ",";
            
-      telem << _FLOAT(currentLat, 6) << "," << _FLOAT(currentLong, 6) << "," << gps_valid;
+      telem << _FLOAT(currentLat, 8) << "," << _FLOAT(currentLong, 8) << "," << gps_valid;
       telem << "," << hdop << "," << pdop;
       telem << "," << sog << "," << cog << ",";
     
@@ -220,7 +220,7 @@ void send_telemetry_wp(){
 
       telem << etm_millis.elapsed()/1000. << ",";
            
-      telem << _FLOAT(currentLat, 6) << "," << _FLOAT(currentLong, 6) << "," << gps_valid;
+      telem << _FLOAT(currentLat, 8) << "," << _FLOAT(currentLong, 8) << "," << gps_valid;
       telem << "," << hdop << "," << pdop;
       telem << "," << sog << "," << cog << ",";
     
