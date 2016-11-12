@@ -97,10 +97,11 @@ const int head_rdiag = 135;
 #define interval 100
 #define interval1 2000
 #define defaultTurnTime 1000
-#define defaultFwdTime 7000
+#define defaultFwdTime 10000 //was 7000
 #define defaultRevTime 700
 #define defaultTelemTime 1000
 #define defaultWayPointTime 1000
+#define defaultOdoTime 20
 
 //Bubble Rebound Parameters
 const float V = 21;
@@ -178,7 +179,7 @@ uint32_t ulProgramModeExitTime = 0;
 // Waypoints  Constants
 #define HEADING_TOLERANCE 5     // tolerance +/- (in degrees) within which we don't attempt to turn to intercept targetHeading
 
-#define WAYPOINT_DIST_TOLERANCE  1   // tolerance in meters to waypoint; once within this tolerance, will advance to the next waypoint
+#define WAYPOINT_DIST_TOLERANCE  2   // tolerance in meters to waypoint; once within this tolerance, will advance to the next waypoint
 #define NUMBER_WAYPOINTS 5          // enter the numebr of way points here (will run from 0 to (n-1))
 int waypointNumber = -1;            // current waypoint number; will run from 0 to (NUMBER_WAYPOINTS -1); start at -1 and gets initialized during setup()
 

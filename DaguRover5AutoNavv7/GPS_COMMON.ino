@@ -87,7 +87,7 @@ void GPS_Average(){
   int32_t dLat, dLon;
   
   //if (fix.valid.location && fix.valid.date && fix.valid.time) {
-  for(int jj = 0; jj < 180; jj++){
+  for(int jj = 0; jj < 90; jj++){
 
   gps.send_P( &gps_port, F("PUBX,00") ); // data polling to the GPS
   state = REQUESTING_PUBX;

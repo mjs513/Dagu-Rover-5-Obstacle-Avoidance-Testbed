@@ -118,6 +118,10 @@
 // Utilities:
 //    Teensy 3.2 Interrupt, https://forum.pjrc.com/threads/35733-Teensy-3-2-Interrupt
 // 
+// ==================================================================
+// Odometry:
+//    IMU Odometry, by David Anderson
+//    http://geology.heroy.smu.edu/~dpa-www/robo/Encoder/imu_odo/
 // -------------------------------------------------------------------
 
 #include <StandardCplusplus.h>
@@ -165,6 +169,7 @@ elapsedMillis motorRevTime;
 elapsedMillis turn_timer;
 elapsedMillis telem_timer;
 elapsedMillis gps_waypoint_timer;
+elapsedMillis odo_timer;
 
 // the interval in mS 
 unsigned long currentTime;
@@ -208,6 +213,12 @@ int ticksLF;
 int ticksRF;
 int ticksRR;
 int ticksLR;
+
+//Current Sensor variables
+float csLF;
+float csRF;
+float csRR;
+float csLR;
 
 unsigned time = millis();
 float fit_time, rebound_angle;
@@ -504,6 +515,11 @@ void loop(){
             break; 
           }
           motorFwd = 0;
+        }
+        
+        if (odo_timer > defaultOdoTime){
+          send_telemetry_wp();
+          odo_timer = 0; 
         }
        }
       mStop(); 

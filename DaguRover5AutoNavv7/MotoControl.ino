@@ -104,11 +104,13 @@ void getTicks_noreset(){
 }
 
 void getCurrent() {
-      telem << "LF-Current: " << _FLOAT(analogRead(CURRENTLF)*v2Amps,3) << endl;
-      telem << "RF-Current: " << _FLOAT(analogRead(CURRENTRF)*v2Amps,3) << endl; 
-      telem << "LR-Current: " << _FLOAT(analogRead(CURRENTLR)*v2Amps,3) << endl;
-      telem << "RR-Current: " << _FLOAT(analogRead(CURRENTRR)*v2Amps,3) << endl;
-	  telem << endl;
+  csLF = analogRead(CURRENTLF)*v2Amps;
+  csRF = analogRead(CURRENTRF)*v2Amps; 
+  csLR = analogRead(CURRENTLR)*v2Amps;
+  csRR = analogRead(CURRENTRR)*v2Amps;
+
+  telem << csLF << "," << csLR << ",";
+  telem << csRF << "," << csRR << ",";
 
 }
 

@@ -242,4 +242,35 @@ void send_telemetry_wp(){
 }
 
 
+void send_telemetry_odo(){     
+    //===  Telemetry section =========
+    if(telem_timer > defaultTelemTime) {
+
+      //DateTime time = rtc.now();
+      //telem << time.timestamp(DateTime::TIMESTAMP_TIME);
+      //telem << utc << ",";
+
+      telem << etm_millis.elapsed()/1000. << ",";
+           
+      // IMU
+      compass_update();
+      telem << -roll << "," << -pitch << "," << yar_heading << ",";
+      telem << wp_heading << ",";
+
+      //Direction
+      telem << "," << gDirection << ",";
+
+      //Get Current Sense
+      getCurrent();
+
+      //Wheel Encoders
+      // zeros out encoder counts and reads encoders zero value
+      //encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+      getTicks_noreset();
+      encA.write(0); encB.write(0); encC.write(0); encD.write(0);
+      
+      telem_timer = 0;
+    }
+}
+
 
