@@ -253,16 +253,16 @@ void loop(){
       //===================================================
       // Used for turn calibration curve
       //===================================================
-      //compass_update();
-      //telem << "Current heading: " << yar_heading << endl;
-      //telem << "Turn Multiplier: " << turn_time_mult << endl;
+      compass_update();
+      telem << "Current heading: " << yar_heading << endl;
+      telem << "Turn Multiplier: " << turn_time_mult << endl;
       telem.println("Turning Left!");
       mLeft();
       //delay(400);  //was 2000
-      delay(turn_time_mult * 100);
+      delay(turn_time_mult * 10);
       mStop();
-      //compass_update();
-      //telem << "Changed heading: " << yar_heading << endl;
+      compass_update();
+      telem << "Changed heading: " << yar_heading << endl;
       while(motorTurnTime < defaultTurnTime) {
        }
       mStop();
@@ -273,16 +273,16 @@ void loop(){
       //===================================================
       // Used for turn calibration curve
       //===================================================
-      //telem << "Turn Multiplier: " << turn_time_mult << endl;
-      //telem.println("Turning Right!");
-      //compass_update();
-      //telem << "Current heading: " << yar_heading << endl;
+      telem << "Turn Multiplier: " << turn_time_mult << endl;
+      telem.println("Turning Right!");
+      compass_update();
+      telem << "Current heading: " << yar_heading << endl;
       mRight();
       //delay(400);
-      delay(turn_time_mult * 100);
+      delay(turn_time_mult * 10);
       mStop();
-      //compass_update();
-      //telem << "Changed heading: " << yar_heading << endl;
+      compass_update();
+      telem << "Changed heading: " << yar_heading << endl;
       while(motorTurnTime < defaultTurnTime) {
         }
       mStop();

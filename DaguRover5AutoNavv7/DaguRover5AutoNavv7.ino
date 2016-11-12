@@ -497,34 +497,38 @@ void loop(){
       case 'f' : 
         motorFwdRunTime = 0;
         motorFwd = 0;
+        odo_timer = 0;
         set_speed(speed);
-        
+        gDirection = DIRECTION_FORWARD;        
         telem.println("Rolling Forward!");
-        gDirection = DIRECTION_FORWARD;
-        send_telemetry();
+
         mForward();
+        etm_millis.start();
+        send_telemetry_odo();
         
        while(motorFwdRunTime < defaultFwdTime){
         //currentTime = millis();
-        if(motorFwd > 200){
-          //Cycle through obstacle avoidance sensors for emergency stop
-          read_sensors();
-          oneSensorCycle();
-          if(obs_array[3] == 1 || obs_array[0] == 1 || obs_array[1] == 1 || obs_array[2] == 1) {
-            mStop();
-            break; 
-          }
-          motorFwd = 0;
-        }
-        
         if (odo_timer > defaultOdoTime){
-          send_telemetry_wp();
+          compass_update();
+          send_telemetry_odo();
           odo_timer = 0; 
         }
+        //if(motorFwd > 200){
+          //Cycle through obstacle avoidance sensors for emergency stop
+        //  read_sensors();
+        //  oneSensorCycle();
+        //  if(obs_array[3] == 1 || obs_array[0] == 1 || obs_array[1] == 1 || obs_array[2] == 1) {
+        //    mStop();
+        //  motorFwd = 0;
+        //  }
+       // }
+        mForward();
        }
+       
+      compass_update();
+      send_telemetry_odo();
       mStop(); 
-      getTicks_noreset();
-      
+      etm_millis.stop();
       motorFwdRunTime = 0;
       break;
       

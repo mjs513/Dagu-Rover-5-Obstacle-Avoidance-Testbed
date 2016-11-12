@@ -21,7 +21,7 @@
 //    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 //============================================================================
 
-#define telem Serial3
+#define telem Serial
 //#define telem Serial3 // telemetry
 
 // The serial connection to the GPS device
@@ -101,7 +101,7 @@ const int head_rdiag = 135;
 #define defaultRevTime 700
 #define defaultTelemTime 1000
 #define defaultWayPointTime 1000
-#define defaultOdoTime 20
+#define defaultOdoTime 50
 
 //Bubble Rebound Parameters
 const float V = 21;
